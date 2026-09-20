@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+ai_models/
+uploads/
+database/*.db
+runs/
+ai_results/
+.env
