@@ -1,0 +1,2460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#0f172a"
+    >
+
+    <meta
+        name="description"
+        content="CivicLens - Crowdsourced Public Infrastructure Auditor"
+    >
+
+    <title>CivicLens - Infrastructure Auditor</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f1f5f9;
+            color: #0f172a;
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: #0f172a;
+            color: white;
+            padding: 15px 20px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #38bdf8;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .status-dot {
+            width: 9px;
+            height: 9px;
+            background: #22c55e;
+            border-radius: 50%;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #1e3a8a
+                );
+
+            color: white;
+            border-radius: 20px;
+
+            padding: 30px 22px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #cbd5e1;
+            max-width: 700px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+
+            padding: 7px 12px;
+            border-radius: 20px;
+
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* =========================
+           STATS
+        ========================= */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+
+            padding: 18px;
+            border-radius: 15px;
+
+            box-shadow:
+                0 3px 12px rgba(15,23,42,0.07);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .stat-value {
+            font-size: 27px;
+            font-weight: 800;
+
+            margin-top: 4px;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .card {
+            background: white;
+            border-radius: 18px;
+
+            padding: 22px;
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 3px 15px rgba(15,23,42,0.07);
+        }
+
+        .card-title {
+            font-size: 21px;
+            font-weight: 800;
+
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            color: #64748b;
+            font-size: 14px;
+
+            margin-bottom: 20px;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            margin-bottom: 7px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+
+            padding: 12px 13px;
+
+            outline: none;
+
+            background: white;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #2563eb;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .location-grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 10px;
+        }
+
+        .gps-button {
+            width: 100%;
+
+            margin-top: 9px;
+
+            background: #e0f2fe;
+            color: #0369a1;
+
+            border: none;
+            border-radius: 10px;
+
+            padding: 11px;
+
+            font-weight: 700;
+        }
+
+        .gps-button:hover {
+            background: #bae6fd;
+        }
+
+        /* =========================
+           IMAGE
+        ========================= */
+
+        .image-box {
+            border: 2px dashed #cbd5e1;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            text-align: center;
+
+            background: #f8fafc;
+        }
+
+        .image-box input {
+            border: none;
+            padding: 5px;
+            background: transparent;
+        }
+
+        .preview {
+            display: none;
+
+            width: 100%;
+            max-height: 300px;
+
+            object-fit: contain;
+
+            border-radius: 12px;
+
+            margin-top: 15px;
+        }
+
+        /* =========================
+           SUBMIT
+        ========================= */
+
+        .submit-button {
+            width: 100%;
+
+            border: none;
+            border-radius: 12px;
+
+            padding: 14px;
+
+            background: #2563eb;
+            color: white;
+
+            font-weight: 800;
+
+            transition: 0.2s;
+        }
+
+        .submit-button:hover {
+            background: #1d4ed8;
+        }
+
+        .submit-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           MESSAGES
+        ========================= */
+
+        .message {
+            display: none;
+
+            padding: 13px 15px;
+
+            border-radius: 10px;
+
+            margin-bottom: 15px;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .message.success {
+            display: block;
+
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .message.error {
+            display: block;
+
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* =========================
+           AI RESULT
+        ========================= */
+
+        .ai-result {
+            display: none;
+
+            background: #eff6ff;
+
+            border: 1px solid #bfdbfe;
+
+            border-radius: 14px;
+
+            padding: 18px;
+
+            margin-top: 18px;
+        }
+
+        .ai-result h3 {
+            margin-bottom: 12px;
+        }
+
+        .ai-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 10px;
+        }
+
+        .ai-item {
+            background: white;
+
+            padding: 12px;
+
+            border-radius: 10px;
+        }
+
+        .ai-label {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .ai-value {
+            font-weight: 800;
+            margin-top: 3px;
+        }
+
+        .detection-list {
+            margin-top: 15px;
+        }
+
+        .detection-item {
+            background: white;
+
+            padding: 10px 12px;
+
+            border-radius: 9px;
+
+            margin-top: 7px;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           REPORTS
+        ========================= */
+
+        .reports-list {
+            display: grid;
+
+            gap: 14px;
+        }
+
+        .report {
+            border: 1px solid #e2e8f0;
+
+            border-radius: 14px;
+
+            overflow: hidden;
+
+            background: white;
+        }
+
+        .report-image {
+            width: 100%;
+            max-height: 280px;
+
+            object-fit: cover;
+
+            display: block;
+        }
+
+        .report-content {
+            padding: 17px;
+        }
+
+        .report-top {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 10px;
+
+            margin-bottom: 10px;
+        }
+
+        .report-type {
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .report-status {
+            background: #dcfce7;
+            color: #166534;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .report-description {
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        .report-location {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .report-ai {
+            font-size: 13px;
+            font-weight: 700;
+
+            padding: 9px 11px;
+
+            border-radius: 8px;
+
+            background: #f1f5f9;
+
+            margin-top: 8px;
+        }
+
+        .report-road {
+            color: #475569;
+            font-size: 13px;
+
+            margin-top: 8px;
+        }
+
+        .report-date {
+            color: #94a3b8;
+            font-size: 11px;
+
+            margin-top: 8px;
+        }
+
+        /* =========================
+           TRANSPARENCY
+        ========================= */
+
+        .transparency-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 10px;
+
+            margin-top: 15px;
+        }
+
+        .transparency-item {
+            background: #f8fafc;
+
+            border-radius: 10px;
+
+            padding: 13px;
+        }
+
+        .transparency-label {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .transparency-value {
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        .transparency-button {
+            width: 100%;
+
+            background: #0f172a;
+            color: white;
+
+            border: none;
+
+            padding: 12px;
+
+            border-radius: 10px;
+
+            margin-top: 10px;
+        }
+
+        /* =========================
+           LOADING
+        ========================= */
+
+        .loading {
+            text-align: center;
+
+            padding: 25px;
+
+            color: #64748b;
+        }
+
+        .empty {
+            text-align: center;
+
+            padding: 30px;
+
+            color: #64748b;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            text-align: center;
+
+            padding: 30px 20px;
+
+            color: #64748b;
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           DESKTOP
+        ========================= */
+
+        @media (min-width: 768px) {
+
+            .hero {
+                padding: 45px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .form-grid {
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+
+                gap: 15px;
+            }
+
+            .full-width {
+                grid-column: 1 / -1;
+            }
+
+            .reports-list {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .container {
+                padding: 12px;
+            }
+
+            .navbar {
+                padding: 13px 15px;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .hero {
+                padding: 25px 18px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .stats {
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 13px;
+            }
+
+            .stat-value {
+                font-size: 22px;
+            }
+
+            .stat-label {
+                font-size: 10px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+
+            .location-grid,
+            .ai-grid,
+            .transparency-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-top {
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Civic<span>Lens</span>
+        </div>
+
+        <div class="status">
+            <div class="status-dot"></div>
+            API Online
+        </div>
+
+    </nav>
+
+
+    <main class="container">
+
+        <!-- =========================
+             HERO
+        ========================= -->
+
+        <section class="hero">
+
+            <div class="hero-badge">
+                Crowdsourced Infrastructure Auditor
+            </div>
+
+            <h1>
+                Report. Verify. Track.
+            </h1>
+
+            <p>
+                CivicLens uses location data, road records and
+                AI-powered image analysis to make public
+                infrastructure problems more transparent.
+            </p>
+
+        </section>
+
+
+        <!-- =========================
+             STATS
+        ========================= -->
+
+        <section class="stats">
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Reports
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="totalReports"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    AI Verified
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="aiVerified"
+                >
+                    -
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Matched Roads
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="matchedRoads"
+                >
+                    -
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             REPORT FORM
+        ========================= -->
+
+        <section class="card">
+
+            <div class="card-title">
+                Report Infrastructure Problem
+            </div>
+
+            <div class="card-subtitle">
+                Upload a photo and provide the location.
+                CivicLens will automatically analyze the image
+                and match the nearest road.
+            </div>
+
+
+            <div
+                id="formMessage"
+                class="message"
+            ></div>
+
+
+            <form id="reportForm">
+
+                <div class="form-grid">
+
+
+                    <!-- ISSUE TYPE -->
+
+                    <div class="form-group">
+
+                        <label for="issueType">
+                            Issue Type
+                        </label>
+
+                        <select
+                            id="issueType"
+                            name="issue_type"
+                            required
+                        >
+
+                            <option value="Pothole">
+                                Pothole
+                            </option>
+
+                            <option value="Road Damage">
+                                Road Damage
+                            </option>
+
+                            <option value="Crack">
+                                Road Crack
+                            </option>
+
+                            <option value="Streetlight">
+                                Broken Streetlight
+                            </option>
+
+                            <option value="Garbage">
+                                Illegal Garbage
+                            </option>
+
+                            <option value="Drainage">
+                                Drainage Problem
+                            </option>
+
+                            <option value="Other">
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="form-group">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <input
+                            id="description"
+                            name="description"
+                            type="text"
+                            placeholder="Example: Large pothole near the junction"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- LOCATION -->
+
+                    <div class="form-group full-width">
+
+                        <label>
+                            Location
+                        </label>
+
+                        <div class="location-grid">
+
+                            <input
+                                id="latitude"
+                                name="latitude"
+                                type="number"
+                                step="any"
+                                placeholder="Latitude"
+                                required
+                            >
+
+                            <input
+                                id="longitude"
+                                name="longitude"
+                                type="number"
+                                step="any"
+                                placeholder="Longitude"
+                                required
+                            >
+
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="gps-button"
+                            id="gpsButton"
+                        >
+                            📍 Use My Current Location
+                        </button>
+
+                    </div>
+
+
+                    <!-- IMAGE -->
+
+                    <div class="form-group full-width">
+
+                        <label>
+                            Infrastructure Photo
+                        </label>
+
+                        <div class="image-box">
+
+                            <input
+                                id="image"
+                                name="image"
+                                type="file"
+                                accept="image/*"
+                                capture="environment"
+                                required
+                            >
+
+                            <img
+                                id="imagePreview"
+                                class="preview"
+                                alt="Selected image preview"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SUBMIT -->
+
+                    <div class="full-width">
+
+                        <button
+                            type="submit"
+                            class="submit-button"
+                            id="submitButton"
+                        >
+                            🚀 Submit Report
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <!-- =========================
+                 AI RESULT
+            ========================= -->
+
+            <div
+                id="aiResult"
+                class="ai-result"
+            >
+
+                <h3>
+                    🤖 CivicLens AI Analysis
+                </h3>
+
+                <div class="ai-grid">
+
+                    <div class="ai-item">
+
+                        <div class="ai-label">
+                            Status
+                        </div>
+
+                        <div
+                            class="ai-value"
+                            id="aiStatus"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-item">
+
+                        <div class="ai-label">
+                            Damage Type
+                        </div>
+
+                        <div
+                            class="ai-value"
+                            id="aiType"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-item">
+
+                        <div class="ai-label">
+                            Damage Count
+                        </div>
+
+                        <div
+                            class="ai-value"
+                            id="aiCount"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-item">
+
+                        <div class="ai-label">
+                            Highest Confidence
+                        </div>
+
+                        <div
+                            class="ai-value"
+                            id="aiConfidence"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="detectionList"
+                    class="detection-list"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             TRANSPARENCY
+        ========================= -->
+
+        <section class="card">
+
+            <div class="card-title">
+                Transparency Report
+            </div>
+
+            <div class="card-subtitle">
+                Enter an issue ID to see the matched road,
+                authority and project information.
+            </div>
+
+            <input
+                id="transparencyId"
+                type="number"
+                min="1"
+                placeholder="Enter Issue ID"
+            >
+
+            <button
+                class="transparency-button"
+                id="transparencyButton"
+            >
+                🔎 View Transparency Report
+            </button>
+
+
+            <div
+                id="transparencyResult"
+            ></div>
+
+        </section>
+
+
+        <!-- =========================
+             RECENT REPORTS
+        ========================= -->
+
+        <section class="card">
+
+            <div class="card-title">
+                Recent CivicLens Reports
+            </div>
+
+            <div class="card-subtitle">
+                Public infrastructure issues reported
+                through CivicLens.
+            </div>
+
+            <div
+                id="reportsList"
+                class="reports-list"
+            >
+
+                <div class="loading">
+                    Loading reports...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        CivicLens © 2026 · Crowdsourced Infrastructure Auditor
+
+    </footer>
+
+
+    <script>
+
+        /* =====================================================
+           CONFIGURATION
+        ===================================================== */
+
+       const API_BASE = "https://slight-headquarters-option-machinery.trycloudflare.com";
+
+
+        /* =====================================================
+           ELEMENTS
+        ===================================================== */
+
+        const reportForm =
+            document.getElementById("reportForm");
+
+        const imageInput =
+            document.getElementById("image");
+
+        const imagePreview =
+            document.getElementById("imagePreview");
+
+        const gpsButton =
+            document.getElementById("gpsButton");
+
+        const submitButton =
+            document.getElementById("submitButton");
+
+        const formMessage =
+            document.getElementById("formMessage");
+
+        const aiResult =
+            document.getElementById("aiResult");
+
+        const aiStatus =
+            document.getElementById("aiStatus");
+
+        const aiType =
+            document.getElementById("aiType");
+
+        const aiCount =
+            document.getElementById("aiCount");
+
+        const aiConfidence =
+            document.getElementById("aiConfidence");
+
+        const detectionList =
+            document.getElementById("detectionList");
+
+        const reportsList =
+            document.getElementById("reportsList");
+
+
+        /* =====================================================
+           MESSAGE FUNCTION
+        ===================================================== */
+
+        function showMessage(
+            message,
+            type
+        ) {
+
+            formMessage.textContent =
+                message;
+
+            formMessage.className =
+                "message " + type;
+
+        }
+
+
+        /* =====================================================
+           IMAGE PREVIEW
+        ===================================================== */
+
+        imageInput.addEventListener(
+            "change",
+            function () {
+
+                const file =
+                    this.files[0];
+
+                if (!file) {
+
+                    imagePreview.style.display =
+                        "none";
+
+                    imagePreview.src = "";
+
+                    return;
+                }
+
+                const imageURL =
+                    URL.createObjectURL(file);
+
+                imagePreview.src =
+                    imageURL;
+
+                imagePreview.style.display =
+                    "block";
+
+            }
+        );
+
+
+        /* =====================================================
+           GPS
+        ===================================================== */
+
+        gpsButton.addEventListener(
+            "click",
+            function () {
+
+                if (!navigator.geolocation) {
+
+                    showMessage(
+                        "GPS is not supported by this browser.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                gpsButton.disabled =
+                    true;
+
+                gpsButton.textContent =
+                    "📍 Getting location...";
+
+
+                navigator.geolocation.getCurrentPosition(
+
+                    function (position) {
+
+                        document.getElementById(
+                            "latitude"
+                        ).value =
+                            position.coords.latitude;
+
+
+                        document.getElementById(
+                            "longitude"
+                        ).value =
+                            position.coords.longitude;
+
+
+                        gpsButton.disabled =
+                            false;
+
+                        gpsButton.textContent =
+                            "✅ Location Captured";
+
+                    },
+
+                    function (error) {
+
+                        gpsButton.disabled =
+                            false;
+
+                        gpsButton.textContent =
+                            "📍 Use My Current Location";
+
+                        showMessage(
+                            "Unable to get GPS location: " +
+                            error.message,
+                            "error"
+                        );
+
+                    },
+
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           SHOW AI RESULT
+        ===================================================== */
+
+        function showAIResult(
+            analysis
+        ) {
+
+            if (!analysis) {
+
+                aiResult.style.display =
+                    "none";
+
+                return;
+            }
+
+
+            aiResult.style.display =
+                "block";
+
+
+            const detected =
+                Boolean(
+                    analysis.damage_detected
+                );
+
+
+            aiStatus.textContent =
+                analysis.status ||
+                analysis.ai_status ||
+                (
+                    detected
+                        ? "Damage detected"
+                        : "No road damage detected"
+                );
+
+
+            const types =
+                Array.isArray(
+                    analysis.damage_types
+                )
+                    ? analysis.damage_types
+                    : [];
+
+
+            aiType.textContent =
+                types.length > 0
+                    ? types.join(", ")
+                    : "None";
+
+
+            aiCount.textContent =
+                analysis.damage_count ??
+                0;
+
+
+            aiConfidence.textContent =
+                analysis.highest_confidence != null
+                    ? analysis.highest_confidence + "%"
+                    : "0%";
+
+
+            detectionList.innerHTML =
+                "";
+
+
+            const detections =
+                Array.isArray(
+                    analysis.detections
+                )
+                    ? analysis.detections
+                    : [];
+
+
+            if (detections.length === 0) {
+
+                return;
+            }
+
+
+            const heading =
+                document.createElement("strong");
+
+            heading.textContent =
+                "Detected objects";
+
+            detectionList.appendChild(
+                heading
+            );
+
+
+            detections.forEach(
+                function (item, index) {
+
+                    const div =
+                        document.createElement(
+                            "div"
+                        );
+
+                    div.className =
+                        "detection-item";
+
+
+                    const confidence =
+                        item.confidence != null
+                            ? item.confidence + "%"
+                            : "N/A";
+
+
+                    div.textContent =
+                        `${index + 1}. ${
+                            item.damage_type ||
+                            "Road damage"
+                        } — ${
+                            confidence
+                        } confidence`;
+
+
+                    detectionList.appendChild(
+                        div
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           SUBMIT REPORT
+        ===================================================== */
+
+        reportForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                submitButton.disabled =
+                    true;
+
+                submitButton.textContent =
+                    "🤖 AI analyzing image...";
+
+
+                aiResult.style.display =
+                    "none";
+
+
+                const formData =
+                    new FormData();
+
+
+                formData.append(
+                    "issue_type",
+                    document.getElementById(
+                        "issueType"
+                    ).value
+                );
+
+
+                formData.append(
+                    "description",
+                    document.getElementById(
+                        "description"
+                    ).value
+                );
+
+
+                formData.append(
+                    "latitude",
+                    document.getElementById(
+                        "latitude"
+                    ).value
+                );
+
+
+                formData.append(
+                    "longitude",
+                    document.getElementById(
+                        "longitude"
+                    ).value
+                );
+
+
+                const imageFile =
+                    imageInput.files[0];
+
+
+                if (!imageFile) {
+
+                    showMessage(
+                        "Please select an image.",
+                        "error"
+                    );
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "🚀 Submit Report";
+
+                    return;
+                }
+
+
+                formData.append(
+                    "image",
+                    imageFile
+                );
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            API_BASE +
+                            "/report-issue",
+                            {
+                                method: "POST",
+                                body: formData
+                            }
+                        );
+
+
+                    const data =
+                        await response.json();
+
+
+                    if (!response.ok) {
+
+                        throw new Error(
+                            data.detail ||
+                            data.message ||
+                            "Report submission failed."
+                        );
+
+                    }
+
+
+                    showMessage(
+                        "Report submitted successfully! Issue ID: " +
+                        data.issue_id,
+                        "success"
+                    );
+
+
+                    /* =============================
+                       AI RESULT
+                    ============================= */
+
+                    if (data.ai_analysis) {
+
+                        showAIResult(
+                            data.ai_analysis
+                        );
+
+                    }
+
+
+                    /* =============================
+                       FORM RESET
+                    ============================= */
+
+                    reportForm.reset();
+
+
+                    imagePreview.src =
+                        "";
+
+                    imagePreview.style.display =
+                        "none";
+
+
+                    gpsButton.textContent =
+                        "📍 Use My Current Location";
+
+
+                    /* =============================
+                       REFRESH REPORTS
+                    ============================= */
+
+                    await loadReports();
+
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Report error:",
+                        error
+                    );
+
+
+                    showMessage(
+                        error.message ||
+                        "Unable to submit report.",
+                        "error"
+                    );
+
+                } finally {
+
+                    submitButton.disabled =
+                        false;
+
+                    submitButton.textContent =
+                        "🚀 Submit Report";
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           LOAD REPORTS
+        ===================================================== */
+
+        async function loadReports() {
+
+            reportsList.innerHTML =
+                `<div class="loading">
+                    Loading reports...
+                 </div>`;
+
+
+            try {
+
+                /*
+                 Cache-busting is intentional.
+                 This prevents the browser from showing
+                 an old /issues response.
+                */
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/issues?t=" +
+                        Date.now()
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Failed to load reports"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "CivicLens /issues response:",
+                    data
+                );
+
+
+                const issues =
+                    Array.isArray(
+                        data.issues
+                    )
+                        ? data.issues
+                        : [];
+
+
+                /* =============================
+                   STATS
+                ============================= */
+
+                document.getElementById(
+                    "totalReports"
+                ).textContent =
+                    issues.length;
+
+
+                const aiVerified =
+                    issues.filter(
+                        function (issue) {
+
+                            return (
+                                Number(
+                                    issue.ai_damage_detected
+                                ) === 1
+                            );
+
+                        }
+                    ).length;
+
+
+                document.getElementById(
+                    "aiVerified"
+                ).textContent =
+                    aiVerified;
+
+
+                const matchedRoads =
+                    issues.filter(
+                        function (issue) {
+
+                            return (
+                                issue.road_id !== null &&
+                                issue.road_id !== undefined
+                            );
+
+                        }
+                    ).length;
+
+
+                document.getElementById(
+                    "matchedRoads"
+                ).textContent =
+                    matchedRoads;
+
+
+                /* =============================
+                   EMPTY STATE
+                ============================= */
+
+                if (issues.length === 0) {
+
+                    reportsList.innerHTML =
+                        `<div class="empty">
+                            No reports found.
+                         </div>`;
+
+                    return;
+                }
+
+
+                /* =============================
+                   CLEAR LIST
+                ============================= */
+
+                reportsList.innerHTML =
+                    "";
+
+
+                /* =============================
+                   CREATE REPORT CARDS
+                ============================= */
+
+                issues.forEach(
+                    function (issue) {
+
+                        const card =
+                            createReportCard(
+                                issue
+                            );
+
+                        reportsList.appendChild(
+                            card
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Load reports error:",
+                    error
+                );
+
+
+                reportsList.innerHTML =
+                    `<div class="message error">
+                        Unable to load reports.
+                        Make sure the CivicLens
+                        backend is running.
+                     </div>`;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           CREATE REPORT CARD
+        ===================================================== */
+
+        function createReportCard(
+            issue
+        ) {
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+            card.className =
+                "report";
+
+
+            /* =============================
+               IMAGE
+            ============================= */
+
+            if (issue.image_url) {
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
+
+                image.className =
+                    "report-image";
+
+                image.src =
+                    issue.image_url;
+
+                image.alt =
+                    issue.issue_type ||
+                    "Infrastructure issue";
+
+
+                image.onerror =
+                    function () {
+
+                        this.style.display =
+                            "none";
+
+                    };
+
+
+                card.appendChild(
+                    image
+                );
+
+            }
+
+
+            const content =
+                document.createElement(
+                    "div"
+                );
+
+            content.className =
+                "report-content";
+
+
+            /* =============================
+               TOP
+            ============================= */
+
+            const top =
+                document.createElement(
+                    "div"
+                );
+
+            top.className =
+                "report-top";
+
+
+            const type =
+                document.createElement(
+                    "div"
+                );
+
+            type.className =
+                "report-type";
+
+            type.textContent =
+                issue.issue_type ||
+                "Infrastructure Issue";
+
+
+            const status =
+                document.createElement(
+                    "div"
+                );
+
+            status.className =
+                "report-status";
+
+            status.textContent =
+                issue.status ||
+                "Reported";
+
+
+            top.appendChild(
+                type
+            );
+
+            top.appendChild(
+                status
+            );
+
+
+            content.appendChild(
+                top
+            );
+
+
+            /* =============================
+               DESCRIPTION
+            ============================= */
+
+            const description =
+                document.createElement(
+                    "div"
+                );
+
+            description.className =
+                "report-description";
+
+            description.textContent =
+                issue.description ||
+                "No description provided.";
+
+
+            content.appendChild(
+                description
+            );
+
+
+            /* =============================
+               LOCATION
+            ============================= */
+
+            const location =
+                document.createElement(
+                    "div"
+                );
+
+            location.className =
+                "report-location";
+
+            location.textContent =
+                `📍 ${
+                    issue.latitude ??
+                    "N/A"
+                }, ${
+                    issue.longitude ??
+                    "N/A"
+                }`;
+
+
+            content.appendChild(
+                location
+            );
+
+
+            /* =============================
+               AI
+            ============================= */
+
+            const reportAI =
+                document.createElement(
+                    "div"
+                );
+
+            reportAI.className =
+                "report-ai";
+
+
+            const aiDetected =
+                Number(
+                    issue.ai_damage_detected
+                ) === 1 ||
+                issue.ai_status ===
+                    "Damage detected";
+
+
+            const types =
+                Array.isArray(
+                    issue.ai_damage_types
+                )
+                    ? issue.ai_damage_types
+                    : [];
+
+
+            if (aiDetected) {
+
+                let text =
+                    "🤖 AI: ";
+
+
+                text +=
+                    types.length > 0
+                        ? types.join(", ")
+                        : "Road damage";
+
+
+                text +=
+                    " detected";
+
+
+                if (
+                    issue.ai_highest_confidence != null &&
+                    Number(
+                        issue.ai_highest_confidence
+                    ) > 0
+                ) {
+
+                    text +=
+                        " • " +
+                        issue.ai_highest_confidence +
+                        "% confidence";
+
+                }
+
+
+                if (
+                    issue.ai_damage_count != null &&
+                    Number(
+                        issue.ai_damage_count
+                    ) > 0
+                ) {
+
+                    text +=
+                        " • " +
+                        issue.ai_damage_count +
+                        " detected";
+
+                }
+
+
+                reportAI.textContent =
+                    text;
+
+
+            } else {
+
+                reportAI.textContent =
+                    "🤖 AI: No damage detected";
+
+            }
+
+
+            content.appendChild(
+                reportAI
+            );
+
+
+            /* =============================
+               ROAD
+            ============================= */
+
+            if (issue.road_name) {
+
+                const road =
+                    document.createElement(
+                        "div"
+                    );
+
+                road.className =
+                    "report-road";
+
+                road.textContent =
+                    `🛣️ Road: ${
+                        issue.road_name
+                    }`;
+
+
+                if (issue.road_type) {
+
+                    road.textContent +=
+                        ` • ${
+                            issue.road_type
+                        }`;
+
+                }
+
+
+                content.appendChild(
+                    road
+                );
+
+            }
+
+
+            /* =============================
+               DATE
+            ============================= */
+
+            if (issue.created_at) {
+
+                const date =
+                    document.createElement(
+                        "div"
+                    );
+
+                date.className =
+                    "report-date";
+
+                date.textContent =
+                    `Issue #${
+                        issue.id
+                    } • ${
+                        issue.created_at
+                    }`;
+
+
+                content.appendChild(
+                    date
+                );
+
+            }
+
+
+            card.appendChild(
+                content
+            );
+
+
+            return card;
+
+        }
+
+
+        /* =====================================================
+           TRANSPARENCY REPORT
+        ===================================================== */
+
+        document.getElementById(
+            "transparencyButton"
+        ).addEventListener(
+            "click",
+            loadTransparency
+        );
+
+
+        async function loadTransparency() {
+
+            const id =
+                document.getElementById(
+                    "transparencyId"
+                ).value;
+
+
+            const result =
+                document.getElementById(
+                    "transparencyResult"
+                );
+
+
+            if (!id) {
+
+                result.innerHTML =
+                    `<div class="message error">
+                        Please enter an Issue ID.
+                     </div>`;
+
+                return;
+            }
+
+
+            result.innerHTML =
+                `<div class="loading">
+                    Loading transparency report...
+                 </div>`;
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        API_BASE +
+                        "/issue-transparency/" +
+                        encodeURIComponent(id) +
+                        "?t=" +
+                        Date.now()
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.detail ||
+                        data.message ||
+                        "Transparency report not found."
+                    );
+
+                }
+
+
+                const report =
+                    data.complete_transparency_report ||
+                    data;
+
+
+                result.innerHTML =
+                    "";
+
+
+                const grid =
+                    document.createElement(
+                        "div"
+                    );
+
+                grid.className =
+                    "transparency-grid";
+
+
+                const fields = [
+
+                    [
+                        "Issue ID",
+                        report.issue_id
+                    ],
+
+                    [
+                        "Issue Type",
+                        report.issue_type
+                    ],
+
+                    [
+                        "Status",
+                        report.issue_status
+                    ],
+
+                    [
+                        "Road",
+                        report.road_name
+                    ],
+
+                    [
+                        "Road Type",
+                        report.road_type
+                    ],
+
+                    [
+                        "Area",
+                        report.area ||
+                        report.road_area
+                    ],
+
+                    [
+                        "Authority",
+                        report.authority_name
+                    ],
+
+                    [
+                        "Department",
+                        report.authority_department
+                    ],
+
+                    [
+                        "Authority Email",
+                        report.authority_email
+                    ],
+
+                    [
+                        "Authority Phone",
+                        report.authority_phone
+                    ],
+
+                    [
+                        "Tender Number",
+                        report.tender_number
+                    ],
+
+                    [
+                        "Project Cost",
+                        report.project_cost
+                    ],
+
+                    [
+                        "Work Description",
+                        report.work_description
+                    ],
+
+                    [
+                        "Start Date",
+                        report.start_date
+                    ],
+
+                    [
+                        "Expected Completion",
+                        report.expected_completion
+                    ],
+
+                    [
+                        "Warranty",
+                        report.warranty_period
+                    ],
+
+                    [
+                        "Project Status",
+                        report.project_status
+                    ],
+
+                    [
+                        "Contractor",
+                        report.contractor_name
+                    ]
+
+                ];
+
+
+                fields.forEach(
+                    function (field) {
+
+                        const item =
+                            document.createElement(
+                                "div"
+                            );
+
+                        item.className =
+                            "transparency-item";
+
+
+                        const label =
+                            document.createElement(
+                                "div"
+                            );
+
+                        label.className =
+                            "transparency-label";
+
+                        label.textContent =
+                            field[0];
+
+
+                        const value =
+                            document.createElement(
+                                "div"
+                            );
+
+                        value.className =
+                            "transparency-value";
+
+                        value.textContent =
+                            field[1] ??
+                            "Not available";
+
+
+                        item.appendChild(
+                            label
+                        );
+
+                        item.appendChild(
+                            value
+                        );
+
+
+                        grid.appendChild(
+                            item
+                        );
+
+                    }
+                );
+
+
+                result.appendChild(
+                    grid
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Transparency error:",
+                    error
+                );
+
+
+                result.innerHTML =
+                    `<div class="message error">
+                        ${
+                            error.message ||
+                            "Unable to load transparency report."
+                        }
+                     </div>`;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           INITIAL LOAD
+        ===================================================== */
+
+        loadReports();
+
+
+        /* =====================================================
+           AUTO REFRESH
+        ===================================================== */
+
+        setInterval(
+            loadReports,
+            30000
+        );
+
+    </script>
+
+</body>
+</html>
