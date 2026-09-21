@@ -624,6 +624,140 @@
             font-size: 13px;
         }
 
+
+        /* =========================
+           INTERACTIVE MAP
+        ========================= */
+
+        .map-card {
+            overflow: hidden;
+        }
+
+        .map-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .map-legend {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px solid white;
+            box-shadow: 0 0 0 1px #cbd5e1;
+        }
+
+        .legend-dot.ai {
+            background: #dc2626;
+        }
+
+        .legend-dot.reported {
+            background: #2563eb;
+        }
+
+        .map-button {
+            border: none;
+            border-radius: 9px;
+            padding: 9px 12px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .map-button:hover {
+            background: #bae6fd;
+        }
+
+        #issueMap {
+            width: 100%;
+            height: 430px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            z-index: 1;
+        }
+
+        .map-popup {
+            min-width: 220px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .map-popup h4 {
+            margin: 0 0 7px;
+            font-size: 16px;
+            color: #0f172a;
+        }
+
+        .map-popup p {
+            margin: 4px 0;
+            color: #475569;
+            font-size: 12px;
+        }
+
+        .map-popup .verified {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 4px 7px;
+            border-radius: 7px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .map-popup .unverified {
+            display: inline-block;
+            margin-top: 7px;
+            padding: 4px 7px;
+            border-radius: 7px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .map-popup .popup-button {
+            width: 100%;
+            margin-top: 9px;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            background: #0f172a;
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .map-popup .popup-button:hover {
+            background: #1e293b;
+        }
+
+        .map-summary {
+            margin-top: 10px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
         /* =========================
            DESKTOP
         ========================= */
@@ -663,6 +797,11 @@
         ========================= */
 
         @media (max-width: 600px) {
+
+
+            #issueMap {
+                height: 360px;
+            }
 
             .container {
                 padding: 12px;
@@ -717,6 +856,14 @@
         }
 
     </style>
+
+    <!-- CivicLens Interactive Map -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin=""
+    >
+
 </head>
 
 <body>
@@ -1096,6 +1243,54 @@
         </section>
 
 
+
+        <!-- =========================
+             INTERACTIVE ISSUE MAP
+        ========================= -->
+
+        <section class="card map-card">
+
+            <div class="card-title">
+                🗺️ Live Infrastructure Issue Map
+            </div>
+
+            <div class="card-subtitle">
+                Explore reported infrastructure problems by location.
+                AI-verified damage is highlighted on the map.
+            </div>
+
+            <div class="map-toolbar">
+                <div class="map-legend">
+                    <span class="legend-item">
+                        <span class="legend-dot ai"></span>
+                        AI verified
+                    </span>
+                    <span class="legend-item">
+                        <span class="legend-dot reported"></span>
+                        Reported
+                    </span>
+                </div>
+
+                <button
+                    type="button"
+                    class="map-button"
+                    id="mapLocateButton"
+                >
+                    📍 Center on my location
+                </button>
+            </div>
+
+            <div id="issueMap"></div>
+
+            <div
+                id="mapSummary"
+                class="map-summary"
+            >
+                Loading issue locations...
+            </div>
+
+        </section>
+
         <!-- =========================
              TRANSPARENCY
         ========================= -->
@@ -1171,6 +1366,12 @@
     </footer>
 
 
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin=""
+    ></script>
+
     <script>
 
         /* =====================================================
@@ -1222,6 +1423,15 @@
 
         const reportsList =
             document.getElementById("reportsList");
+
+        const mapSummary =
+            document.getElementById("mapSummary");
+
+        const mapLocateButton =
+            document.getElementById("mapLocateButton");
+
+        let issueMap = null;
+        let issueMarkers = [];
 
 
         /* =====================================================
@@ -1673,6 +1883,318 @@
         );
 
 
+
+        /* =====================================================
+           INTERACTIVE ISSUE MAP
+        ===================================================== */
+
+        function createMap() {
+            if (typeof L === "undefined") {
+                mapSummary.textContent =
+                    "Map library could not be loaded.";
+                return;
+            }
+
+            issueMap = L.map("issueMap");
+
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    maxZoom: 19,
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+                }
+            ).addTo(issueMap);
+
+            // Initial view: Salem, Tamil Nadu, matching the current demo data.
+            issueMap.setView(
+                [11.6643, 78.1460],
+                13
+            );
+        }
+
+
+        function clearIssueMarkers() {
+            issueMarkers.forEach(function (marker) {
+                issueMap.removeLayer(marker);
+            });
+
+            issueMarkers = [];
+        }
+
+
+        function getMarkerColor(issue) {
+            const aiVerified =
+                Number(issue.ai_damage_detected) === 1 ||
+                issue.ai_status === "Damage detected";
+
+            return aiVerified ? "#dc2626" : "#2563eb";
+        }
+
+
+        function escapePopup(value) {
+            const text =
+                value === null ||
+                value === undefined
+                    ? "Not available"
+                    : String(value);
+
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+
+        function buildPopup(issue) {
+            const aiVerified =
+                Number(issue.ai_damage_detected) === 1 ||
+                issue.ai_status === "Damage detected";
+
+            const types =
+                Array.isArray(issue.ai_damage_types)
+                    ? issue.ai_damage_types.join(", ")
+                    : "Road damage";
+
+            const confidence =
+                issue.ai_highest_confidence != null &&
+                Number(issue.ai_highest_confidence) > 0
+                    ? Number(issue.ai_highest_confidence) + "%"
+                    : "N/A";
+
+            const road =
+                issue.road_name ||
+                "Road not matched";
+
+            const authority =
+                issue.authority_name ||
+                "Authority not available";
+
+            const badge = aiVerified
+                ? `<span class="verified">🤖 AI verified • ${escapePopup(types)} • ${escapePopup(confidence)}</span>`
+                : `<span class="unverified">📋 Reported issue</span>`;
+
+            return `
+                <div class="map-popup">
+                    <h4>
+                        ${escapePopup(
+                            issue.issue_type ||
+                            "Infrastructure issue"
+                        )}
+                    </h4>
+
+                    <p>
+                        <strong>Issue #${escapePopup(issue.id)}</strong>
+                    </p>
+
+                    <p>
+                        📍 ${escapePopup(issue.latitude)},
+                        ${escapePopup(issue.longitude)}
+                    </p>
+
+                    <p>
+                        🛣️ ${escapePopup(road)}
+                    </p>
+
+                    <p>
+                        🏛️ ${escapePopup(authority)}
+                    </p>
+
+                    ${badge}
+
+                    <button
+                        class="popup-button"
+                        type="button"
+                        onclick="focusReport(${Number(issue.id)})"
+                    >
+                        View transparency report
+                    </button>
+                </div>
+            `;
+        }
+
+
+        function updateIssueMap(issues) {
+            if (!issueMap) {
+                return;
+            }
+
+            clearIssueMarkers();
+
+            const validIssues =
+                issues.filter(function (issue) {
+                    const lat = Number(issue.latitude);
+                    const lon = Number(issue.longitude);
+
+                    return (
+                        Number.isFinite(lat) &&
+                        Number.isFinite(lon) &&
+                        lat >= -90 &&
+                        lat <= 90 &&
+                        lon >= -180 &&
+                        lon <= 180
+                    );
+                });
+
+            if (validIssues.length === 0) {
+                mapSummary.textContent =
+                    "No reports with valid GPS coordinates.";
+                return;
+            }
+
+            const bounds = [];
+
+            validIssues.forEach(function (issue) {
+                const lat = Number(issue.latitude);
+                const lon = Number(issue.longitude);
+
+                const marker = L.circleMarker(
+                    [lat, lon],
+                    {
+                        radius: 9,
+                        color: "#ffffff",
+                        weight: 2,
+                        fillColor: getMarkerColor(issue),
+                        fillOpacity: 0.9
+                    }
+                );
+
+                marker.bindPopup(
+                    buildPopup(issue)
+                );
+
+                marker.addTo(issueMap);
+                issueMarkers.push(marker);
+                bounds.push([lat, lon]);
+            });
+
+            if (bounds.length === 1) {
+                issueMap.setView(
+                    bounds[0],
+                    15
+                );
+            } else {
+                issueMap.fitBounds(
+                    bounds,
+                    {
+                        padding: [25, 25],
+                        maxZoom: 15
+                    }
+                );
+            }
+
+            const aiCount =
+                validIssues.filter(
+                    function (issue) {
+                        return (
+                            Number(
+                                issue.ai_damage_detected
+                            ) === 1 ||
+                            issue.ai_status ===
+                                "Damage detected"
+                        );
+                    }
+                ).length;
+
+            mapSummary.textContent =
+                `${validIssues.length} issue location(s) shown • ${aiCount} AI verified`;
+        }
+
+
+        function focusReport(issueId) {
+            const input =
+                document.getElementById(
+                    "transparencyId"
+                );
+
+            input.value = issueId;
+
+            loadTransparency();
+
+            document.getElementById(
+                "transparencyResult"
+            ).scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+
+        mapLocateButton.addEventListener(
+            "click",
+            function () {
+                if (!navigator.geolocation) {
+                    mapSummary.textContent =
+                        "GPS is not supported by this browser.";
+                    return;
+                }
+
+                mapLocateButton.disabled = true;
+                mapLocateButton.textContent =
+                    "📍 Locating...";
+
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const lat =
+                            position.coords.latitude;
+
+                        const lon =
+                            position.coords.longitude;
+
+                        if (issueMap) {
+                            issueMap.setView(
+                                [lat, lon],
+                                16
+                            );
+
+                            L.circleMarker(
+                                [lat, lon],
+                                {
+                                    radius: 8,
+                                    color: "#ffffff",
+                                    weight: 2,
+                                    fillColor: "#16a34a",
+                                    fillOpacity: 0.95
+                                }
+                            )
+                                .addTo(issueMap)
+                                .bindPopup(
+                                    "📍 Your current location"
+                                )
+                                .openPopup();
+                        }
+
+                        mapLocateButton.disabled =
+                            false;
+
+                        mapLocateButton.textContent =
+                            "📍 Center on my location";
+                    },
+                    function (error) {
+                        mapLocateButton.disabled =
+                            false;
+
+                        mapLocateButton.textContent =
+                            "📍 Center on my location";
+
+                        mapSummary.textContent =
+                            "Unable to get your location: " +
+                            error.message;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            }
+        );
+
+
+        createMap();
+
         /* =====================================================
            LOAD REPORTS
         ===================================================== */
@@ -1726,6 +2248,9 @@
                     )
                         ? data.issues
                         : [];
+
+
+                updateIssueMap(issues);
 
 
                 /* =============================
