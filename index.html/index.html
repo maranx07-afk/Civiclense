@@ -855,7 +855,150 @@
 
         }
 
-    </style>
+    
+/* ===== Accountability Dashboard ===== */
+.accountability-section {
+    padding: 28px 0 10px;
+}
+.accountability-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 18px 0 22px;
+}
+.accountability-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.06);
+}
+.accountability-card .label {
+    font-size: .82rem;
+    opacity: .72;
+    margin-bottom: 7px;
+}
+.accountability-card .value {
+    font-size: 1.55rem;
+    font-weight: 800;
+}
+.accountability-table-wrap {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,.08);
+    background: var(--card-bg, #fff);
+}
+.accountability-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 820px;
+}
+.accountability-table th,
+.accountability-table td {
+    padding: 13px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0,0,0,.07);
+    vertical-align: top;
+}
+.accountability-table th {
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    opacity: .72;
+}
+.accountability-table tr:last-child td {
+    border-bottom: 0;
+}
+.accountability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 700;
+}
+.accountability-badge.ai {
+    background: rgba(220, 38, 38, .10);
+    color: #b91c1c;
+}
+.accountability-badge.reported {
+    background: rgba(37, 99, 235, .10);
+    color: #1d4ed8;
+}
+.accountability-muted {
+    opacity: .65;
+}
+.accountability-empty {
+    padding: 28px;
+    text-align: center;
+    opacity: .7;
+}
+.accountability-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.accountability-refresh {
+    border: 0;
+    border-radius: 10px;
+    padding: 9px 13px;
+    cursor: pointer;
+    font-weight: 700;
+}
+.authority-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 16px;
+    padding: 18px;
+}
+.authority-card h4 {
+    margin: 0 0 5px;
+}
+.authority-meta {
+    font-size: .84rem;
+    opacity: .72;
+    margin-bottom: 14px;
+}
+.authority-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+}
+.authority-stat {
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.035);
+}
+.authority-stat strong {
+    display: block;
+    font-size: 1.15rem;
+}
+.authority-stat span {
+    display: block;
+    font-size: .72rem;
+    opacity: .7;
+}
+.authority-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+@media (max-width: 900px) {
+    .accountability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .authority-cards { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+    .accountability-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .accountability-card { padding: 14px; }
+    .accountability-card .value { font-size: 1.25rem; }
+    .authority-stats { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+</style>
 
     <!-- CivicLens Interactive Map -->
     <link
@@ -1248,7 +1391,51 @@
              INTERACTIVE ISSUE MAP
         ========================= -->
 
-        <section class="card map-card">
+        
+<!-- ===== Accountability Dashboard ===== -->
+<section class="accountability-section" id="accountabilityDashboard">
+    <div class="accountability-header">
+        <div>
+            <h2>🏛️ Government Accountability Dashboard</h2>
+            <p>Road-wise issues, AI verification, responsible authorities and project information.</p>
+        </div>
+        <button class="accountability-refresh" type="button" onclick="loadAccountabilityDashboard()">
+            🔄 Refresh dashboard
+        </button>
+    </div>
+
+    <div class="accountability-grid" id="accountabilityStats">
+        <div class="accountability-card">
+            <div class="label">Total reports</div>
+            <div class="value" id="dashTotalReports">—</div>
+        </div>
+        <div class="accountability-card">
+            <div class="label">AI verified</div>
+            <div class="value" id="dashAIReports">—</div>
+        </div>
+        <div class="accountability-card">
+            <div class="label">Roads affected</div>
+            <div class="value" id="dashRoads">—</div>
+        </div>
+        <div class="accountability-card">
+            <div class="label">Authorities involved</div>
+            <div class="value" id="dashAuthorities">—</div>
+        </div>
+    </div>
+
+    <div class="authority-cards" id="authorityCards">
+        <div class="accountability-empty">Loading authority accountability data…</div>
+    </div>
+
+    <div style="margin-top:22px;">
+        <h3>📋 Road & Project Accountability</h3>
+        <div class="accountability-table-wrap" id="accountabilityTableWrap">
+            <div class="accountability-empty">Loading road accountability data…</div>
+        </div>
+    </div>
+</section>
+
+<section class="card map-card">
 
             <div class="card-title">
                 🗺️ Live Infrastructure Issue Map
@@ -1378,7 +1565,7 @@
            CONFIGURATION
         ===================================================== */
 
-       const API_BASE = "https://forum-remaining-pop-cases.trycloudflare.com";
+        const API_BASE = "https://floating-pressure-motivation-clearly.trycloudflare.com";
 
 
         /* =====================================================
@@ -2979,7 +3166,209 @@
             30000
         );
 
-    </script>
+    
+/* ===== Accountability Dashboard ===== */
+function safeNumber(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+}
+
+function dashboardText(value, fallback = "Not available") {
+    return value === null || value === undefined || value === "" ? fallback : String(value);
+}
+
+async function fetchTransparencyForIssue(issueId) {
+    try {
+        const response = await fetch(`${API_BASE}/issue-transparency/${encodeURIComponent(issueId)}?t=${Date.now()}`, {
+            cache: "no-store"
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data && data.success !== false ? (data.report || data.data || data) : null;
+    } catch (error) {
+        console.warn("Transparency lookup failed for issue", issueId, error);
+        return null;
+    }
+}
+
+async function loadAccountabilityDashboard() {
+    const totalEl = document.getElementById("dashTotalReports");
+    const aiEl = document.getElementById("dashAIReports");
+    const roadsEl = document.getElementById("dashRoads");
+    const authoritiesEl = document.getElementById("dashAuthorities");
+    const authorityCards = document.getElementById("authorityCards");
+    const tableWrap = document.getElementById("accountabilityTableWrap");
+
+    if (!totalEl || !authorityCards || !tableWrap) return;
+
+    try {
+        totalEl.textContent = "…";
+        aiEl.textContent = "…";
+        roadsEl.textContent = "…";
+        authoritiesEl.textContent = "…";
+
+        const response = await fetch(`${API_BASE}/issues?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Issues API returned ${response.status}`);
+
+        const payload = await response.json();
+        const issues = Array.isArray(payload.issues) ? payload.issues : [];
+
+        const aiVerified = issues.filter(i => safeNumber(i.ai_damage_detected) === 1 || safeNumber(i.ai_damage_count) > 0);
+        const roads = new Map();
+        const authorities = new Map();
+
+        issues.forEach(issue => {
+            const roadId = issue.road_id ?? issue.road?.id ?? null;
+            const roadName = issue.road_name ?? issue.road?.road_name ?? null;
+            const authorityName = issue.authority_name ?? issue.authority?.name ?? null;
+
+            if (roadId || roadName) {
+                const key = String(roadId || roadName);
+                if (!roads.has(key)) {
+                    roads.set(key, {
+                        roadId,
+                        roadName: roadName || "Unnamed road",
+                        roadType: issue.road_type || issue.road?.road_type || "—",
+                        area: issue.area || issue.road_area || issue.road?.area || "—",
+                        authority: authorityName || "Not assigned",
+                        reports: 0,
+                        ai: 0,
+                        issueIds: []
+                    });
+                }
+                const r = roads.get(key);
+                r.reports++;
+                if (safeNumber(issue.ai_damage_detected) === 1 || safeNumber(issue.ai_damage_count) > 0) r.ai++;
+                r.issueIds.push(issue.id);
+            }
+
+            if (authorityName) {
+                const key = authorityName.trim();
+                if (!authorities.has(key)) {
+                    authorities.set(key, {
+                        name: key,
+                        reports: 0,
+                        ai: 0,
+                        roads: new Set(),
+                        departments: new Set()
+                    });
+                }
+                const a = authorities.get(key);
+                a.reports++;
+                if (safeNumber(issue.ai_damage_detected) === 1 || safeNumber(issue.ai_damage_count) > 0) a.ai++;
+                if (roadId || roadName) a.roads.add(String(roadId || roadName));
+                const dept = issue.authority_department ?? issue.authority?.department;
+                if (dept) a.departments.add(dept);
+            }
+        });
+
+        totalEl.textContent = issues.length;
+        aiEl.textContent = aiVerified.length;
+        roadsEl.textContent = roads.size;
+        authoritiesEl.textContent = authorities.size;
+
+        if (!authorities.size) {
+            authorityCards.innerHTML = `<div class="accountability-empty">No authority-linked reports yet.</div>`;
+        } else {
+            authorityCards.innerHTML = Array.from(authorities.values())
+                .sort((a, b) => b.reports - a.reports)
+                .map(a => `
+                    <div class="authority-card">
+                        <h4>${escapePopup(a.name)}</h4>
+                        <div class="authority-meta">
+                            ${a.departments.size ? escapePopup(Array.from(a.departments).join(" • ")) : "Department not available"}
+                        </div>
+                        <div class="authority-stats">
+                            <div class="authority-stat">
+                                <strong>${a.reports}</strong>
+                                <span>Reports</span>
+                            </div>
+                            <div class="authority-stat">
+                                <strong>${a.ai}</strong>
+                                <span>AI verified</span>
+                            </div>
+                            <div class="authority-stat">
+                                <strong>${a.roads.size}</strong>
+                                <span>Roads</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join("");
+        }
+
+        if (!roads.size) {
+            tableWrap.innerHTML = `<div class="accountability-empty">No road-linked reports available yet.</div>`;
+            return;
+        }
+
+        // Fetch transparency/project details for one representative issue per road.
+        const roadRows = await Promise.all(Array.from(roads.values()).map(async r => {
+            const transparency = r.issueIds.length ? await fetchTransparencyForIssue(r.issueIds[0]) : null;
+            r.transparency = transparency || {};
+            return r;
+        }));
+
+        tableWrap.innerHTML = `
+            <table class="accountability-table">
+                <thead>
+                    <tr>
+                        <th>Road</th>
+                        <th>Authority</th>
+                        <th>Issues</th>
+                        <th>AI verified</th>
+                        <th>Tender</th>
+                        <th>Project cost</th>
+                        <th>Contractor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${roadRows.map(r => {
+                        const t = r.transparency || {};
+                        const tender = t.tender_number ?? t.tender?.tender_number ?? null;
+                        const cost = t.project_cost ?? t.project?.project_cost ?? null;
+                        const contractor = t.contractor_name ?? t.contractor?.name ?? null;
+                        const authority = t.authority_name ?? t.authority?.name ?? r.authority;
+                        return `
+                            <tr>
+                                <td>
+                                    <strong>${escapePopup(r.roadName)}</strong><br>
+                                    <span class="accountability-muted">${escapePopup(r.roadType)} • ${escapePopup(r.area)}</span>
+                                </td>
+                                <td>${escapePopup(dashboardText(authority))}</td>
+                                <td>${r.reports}</td>
+                                <td>
+                                    <span class="accountability-badge ${r.ai > 0 ? "ai" : "reported"}">
+                                        ${r.ai > 0 ? "🤖 " + r.ai : "📌 0"}
+                                    </span>
+                                </td>
+                                <td>${escapePopup(dashboardText(tender))}</td>
+                                <td>${cost !== null && cost !== undefined && cost !== "" ? "₹" + safeNumber(cost).toLocaleString("en-IN") : "Not available"}</td>
+                                <td>${escapePopup(dashboardText(contractor))}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        `;
+    } catch (error) {
+        console.error("Accountability dashboard error:", error);
+        totalEl.textContent = "—";
+        aiEl.textContent = "—";
+        roadsEl.textContent = "—";
+        authoritiesEl.textContent = "—";
+        authorityCards.innerHTML = `<div class="accountability-empty">Unable to load accountability data. Check that the CivicLens backend is running.</div>`;
+        tableWrap.innerHTML = `<div class="accountability-empty">Unable to load road/project data.</div>`;
+    }
+}
+
+</script>
+
+
+setTimeout(() => {
+    if (typeof loadAccountabilityDashboard === "function") {
+        loadAccountabilityDashboard();
+    }
+}, 500);
 
 </body>
 </html>
