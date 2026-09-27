@@ -1,29 +1,75 @@
 import os
+import json
 from pathlib import Path
 
 from ultralytics import YOLO
+from huggingface_hub import hf_hub_download
 
 
 # ============================================================
 # CIVICLENS ROAD DAMAGE AI
 # ============================================================
 
-BASE_DIR = Path(r"D:\CivicLens")
+MODEL_REPO = "nsr51324/Road_Damage_Object_Detection"
+MODEL_FILENAME = "runs/detect/yolov8_road/weights/best.pt"
 
-MODEL_PATH = (
-    BASE_DIR
-    / "ai_models"
-    / "road_damage_best.pt"
+IMAGE_SIZE = 640
+CONFIDENCE_THRESHOLD = 0.30
+IOU_THRESHOLD = 0.45
+
+LOCAL_BASE_DIR = Path(
+    os.getenv("CIVICLENS_BASE_DIR", r"D:\CivicLens")
 )
 
-RESULTS_DIR = BASE_DIR / "ai_results"
+MODEL_FOLDER = Path(
+    os.getenv(
+        "CIVICLENS_MODEL_DIR",
+        str(LOCAL_BASE_DIR / "ai_models")
+    )
+)
 
-RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+MODEL_FOLDER.mkdir(parents=True, exist_ok=True)
+
+LOCAL_MODEL_PATH = MODEL_FOLDER / "road_damage_best.pt"
 
 
-print("========================================")
-print("CIVICLENS ROAD DAMAGE AI")
-print("========================================")
+# ============================================================
+# DOWNLOAD MODEL
+# ============================================================
+
+def get_model_path():
+    """
+    Local PC:
+        Uses D:\CivicLens\ai_models\road_damage_best.pt
+        when that file already exists.
+
+    Cloud:
+        If the local file does not exist, downloads the
+        official trained checkpoint from Hugging Face.
+    """
+
+    if LOCAL_MODEL_PATH.exists():
+        print(f"Using local CivicLens model: {LOCAL_MODEL_PATH}")
+        return str(LOCAL_MODEL_PATH)
+
+    print("\n========================================")
+    print("CIVICLENS AI MODEL DOWNLOAD")
+    print("========================================")
+    print("Local model not found.")
+    print("Downloading road-damage YOLOv8 model...")
+    print(f"Repository: {MODEL_REPO}")
+
+    downloaded_path = hf_hub_download(
+        repo_id=MODEL_REPO,
+        filename=MODEL_FILENAME,
+        cache_dir=str(MODEL_FOLDER)
+    )
+
+    print(f"Model downloaded successfully:")
+    print(downloaded_path)
+    print("========================================\n")
+
+    return downloaded_path
 
 
 # ============================================================
@@ -31,18 +77,18 @@ print("========================================")
 # ============================================================
 
 def load_model():
-    print("\nLoading road-damage AI model...")
+    """
+    Load the CivicLens road-damage YOLO model.
 
-    if not MODEL_PATH.exists():
-        raise FileNotFoundError(
-            f"AI model not found:\n{MODEL_PATH}\n\n"
-            "Copy the downloaded best.pt model to this location "
-            "and rename it to road_damage_best.pt"
-        )
+    The returned object is compatible with main.py.
+    """
 
-    model = YOLO(str(MODEL_PATH))
+    model_path = get_model_path()
 
-    print("Road-damage AI model loaded successfully!")
+    print("Loading CivicLens YOLO model...")
+    model = YOLO(model_path)
+
+    print("CivicLens YOLO model ready!")
 
     return model
 
@@ -52,146 +98,134 @@ def load_model():
 # ============================================================
 
 def analyze_image(image_path, model):
-    image_path = str(image_path).strip().strip('"')
-
-    if not os.path.exists(image_path):
-        return {
-            "success": False,
-            "error": "Image file not found"
-        }
+    """
+    Analyze a road image and return the result in the format
+    expected by CivicLens backend.
+    """
 
     try:
-        print("\nAI is analyzing image...")
+        print("\n----------------------------------------")
+        print("CIVICLENS AI IMAGE ANALYSIS")
+        print("----------------------------------------")
         print(f"Image: {image_path}")
+        print(f"Image size: {IMAGE_SIZE}")
+        print(f"Confidence: {CONFIDENCE_THRESHOLD}")
+        print(f"IoU: {IOU_THRESHOLD}")
 
         results = model.predict(
             source=image_path,
-            imgsz=320,
-            conf=0.25,
-            save=True,
-            project=str(RESULTS_DIR),
-            name="detections",
-            exist_ok=True,
+            imgsz=IMAGE_SIZE,
+            conf=CONFIDENCE_THRESHOLD,
+            iou=IOU_THRESHOLD,
+            augment=False,
             verbose=False
         )
+
+        if not results:
+            return {
+                "success": True,
+                "damage_detected": False,
+                "damage_count": 0,
+                "damage_types": [],
+                "highest_confidence": 0,
+                "detections": [],
+                "ai_status": "No detections"
+            }
 
         result = results[0]
 
         detections = []
+        damage_types = []
+        highest_confidence = 0.0
 
-        if result.boxes is not None and len(result.boxes) > 0:
+        names = result.names
 
-            boxes = result.boxes
+        if result.boxes is not None:
+            for box in result.boxes:
+                confidence = float(box.conf[0])
+                class_id = int(box.cls[0])
 
-            for i in range(len(boxes)):
+                if isinstance(names, dict):
+                    class_name = names.get(
+                        class_id,
+                        str(class_id)
+                    )
+                else:
+                    class_name = names[class_id]
 
-                class_id = int(boxes.cls[i].item())
-                confidence = float(boxes.conf[i].item())
+                class_name = str(class_name)
 
-                label = result.names.get(
-                    class_id,
-                    f"class_{class_id}"
-                )
+                # Bounding box
+                xyxy = box.xyxy[0].tolist()
 
-                xyxy = boxes.xyxy[i].tolist()
+                x1 = round(float(xyxy[0]), 2)
+                y1 = round(float(xyxy[1]), 2)
+                x2 = round(float(xyxy[2]), 2)
+                y2 = round(float(xyxy[3]), 2)
 
-                detections.append({
-                    "damage_type": label,
-                    "confidence": round(confidence * 100, 2),
-                    "bounding_box": {
-                        "x1": round(xyxy[0], 2),
-                        "y1": round(xyxy[1], 2),
-                        "x2": round(xyxy[2], 2),
-                        "y2": round(xyxy[3], 2)
+                detection = {
+                    "class_id": class_id,
+                    "class_name": class_name,
+                    "confidence": round(
+                        confidence * 100,
+                        2
+                    ),
+                    "bbox": {
+                        "x1": x1,
+                        "y1": y1,
+                        "x2": x2,
+                        "y2": y2
                     }
-                })
+                }
 
-        # ----------------------------------------------------
-        # SUMMARY
-        # ----------------------------------------------------
+                detections.append(detection)
+
+                if class_name not in damage_types:
+                    damage_types.append(class_name)
+
+                highest_confidence = max(
+                    highest_confidence,
+                    confidence * 100
+                )
 
         damage_count = len(detections)
+        damage_detected = damage_count > 0
 
-        if damage_count > 0:
-
-            highest_confidence = max(
-                item["confidence"]
-                for item in detections
-            )
-
-            damage_types = sorted(
-                set(
-                    item["damage_type"]
-                    for item in detections
-                )
-            )
-
+        if damage_detected:
             ai_status = "Damage detected"
-
         else:
-
-            highest_confidence = 0
-
-            damage_types = []
-
             ai_status = "No road damage detected"
 
-        # ----------------------------------------------------
-        # RESULT
-        # ----------------------------------------------------
-
-        return {
+        result_data = {
             "success": True,
-            "damage_detected": damage_count > 0,
+            "damage_detected": damage_detected,
             "damage_count": damage_count,
             "damage_types": damage_types,
-            "highest_confidence": highest_confidence,
+            "highest_confidence": round(
+                highest_confidence,
+                2
+            ),
             "detections": detections,
-            "ai_status": ai_status,
-            "result_image": str(
-                RESULTS_DIR / "detections"
-            )
+            "ai_status": ai_status
         }
 
+        print("\nAI RESULT:")
+        print(json.dumps(result_data, indent=2))
+
+        print("----------------------------------------\n")
+
+        return result_data
+
     except Exception as error:
+        print("\nCIVICLENS AI ERROR:")
+        print(error)
 
         return {
             "success": False,
-            "error": str(error)
+            "damage_detected": False,
+            "damage_count": 0,
+            "damage_types": [],
+            "highest_confidence": 0,
+            "detections": [],
+            "ai_status": f"AI error: {error}"
         }
-
-
-# ============================================================
-# TEST MODE
-# ============================================================
-
-if __name__ == "__main__":
-
-    try:
-
-        model = load_model()
-
-        image_path = input(
-            "\nEnter image path: "
-        ).strip().strip('"')
-
-        result = analyze_image(
-            image_path,
-            model
-        )
-
-        print("\n========================================")
-        print("AI RESULT")
-        print("========================================")
-
-        print("\n")
-
-        print(result)
-
-    except Exception as error:
-
-        print("\n========================================")
-        print("AI ENGINE ERROR")
-        print("========================================")
-
-        print(error)

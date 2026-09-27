@@ -2,12 +2,8 @@ venv/
 __pycache__/
 *.pyc
 .git/
+.gitignore
 runs/
 *.log
-
 uploads/*
 ai_results/*
-ai_models/*
-database/*.db
-
-.env
