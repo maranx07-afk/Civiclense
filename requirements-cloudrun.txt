@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+psycopg[binary]
+python-dotenv
+python-multipart
+ultralytics
+Pillow
+numpy
+opencv-python-headless

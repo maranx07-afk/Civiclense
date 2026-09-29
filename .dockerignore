@@ -1,0 +1,12 @@
+.env
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+uploads/
+runs/
+ai_results/
+*.db
+database/*.db
+frontend/
