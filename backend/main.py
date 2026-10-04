@@ -3,6 +3,7 @@ import json
 import math
 import tempfile
 import uuid
+import gc
 from pathlib import Path
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -16,6 +17,8 @@ from dotenv import load_dotenv
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+
+from PIL import Image, ImageOps
 
 from ai_engine.detector import load_model, analyze_image
 
@@ -742,6 +745,67 @@ def find_nearest_road(
 
 
 # ============================================================
+# MEMORY-SAFE IMAGE PROCESSING
+# ============================================================
+
+MAX_UPLOAD_MB = 12
+MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
+MAX_IMAGE_DIMENSION = 1280
+JPEG_QUALITY = 82
+
+def prepare_image_for_civiclens(upload_file: UploadFile):
+    """Save upload in chunks, resize/compress, and return temp JPEG path."""
+    original_temp_path = None
+    optimized_temp_path = None
+    try:
+        suffix = Path(upload_file.filename or ".jpg").suffix.lower()
+        original_temp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+        original_temp_path = Path(original_temp.name)
+        total_bytes = 0
+        while True:
+            chunk = upload_file.file.read(1024 * 1024)
+            if not chunk:
+                break
+            total_bytes += len(chunk)
+            if total_bytes > MAX_UPLOAD_BYTES:
+                original_temp.close()
+                original_temp_path.unlink(missing_ok=True)
+                raise ValueError(f"Image is too large. Maximum allowed size is {MAX_UPLOAD_MB} MB.")
+            original_temp.write(chunk)
+        original_temp.close()
+        if total_bytes == 0:
+            raise ValueError("Uploaded image is empty")
+        print("Original upload size:", total_bytes, "bytes")
+        with Image.open(original_temp_path) as original_image:
+            image = ImageOps.exif_transpose(original_image)
+            if image.mode in ("RGBA", "LA") or "transparency" in image.info:
+                image = image.convert("RGBA")
+                background = Image.new("RGB", image.size, "white")
+                background.paste(image, mask=image.getchannel("A"))
+                image = background
+            else:
+                image = image.convert("RGB")
+            image.thumbnail((MAX_IMAGE_DIMENSION, MAX_IMAGE_DIMENSION), Image.Resampling.LANCZOS)
+            optimized_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
+            optimized_temp_path = Path(optimized_temp.name)
+            optimized_temp.close()
+            image.save(optimized_temp_path, format="JPEG", quality=JPEG_QUALITY, optimize=True)
+            image.close()
+            del image
+        original_temp_path.unlink(missing_ok=True)
+        original_temp_path = None
+        gc.collect()
+        print("Optimized image size:", optimized_temp_path.stat().st_size, "bytes")
+        return optimized_temp_path
+    except Exception:
+        if original_temp_path:
+            original_temp_path.unlink(missing_ok=True)
+        if optimized_temp_path:
+            optimized_temp_path.unlink(missing_ok=True)
+        raise
+
+
+# ============================================================
 # REPORT ISSUE
 # ============================================================
 
@@ -797,173 +861,70 @@ async def report_issue(
 
         if image is not None:
 
-
-            extension = Path(
-                image.filename or ""
-            ).suffix.lower()
-
-
-            allowed_extensions = [
-                ".jpg",
-                ".jpeg",
-                ".png",
-                ".webp"
-            ]
-
+            extension = Path(image.filename or "").suffix.lower()
+            allowed_extensions = [".jpg", ".jpeg", ".png", ".webp"]
 
             if extension not in allowed_extensions:
-
                 return {
                     "success": False,
-                    "error":
-                        "Unsupported image format. "
-                        "Use JPG, JPEG, PNG or WEBP."
+                    "error": "Unsupported image format. Use JPG, JPEG, PNG or WEBP."
                 }
-
-
-            # ------------------------------------------------
-            # READ IMAGE
-            # ------------------------------------------------
-
-            image_bytes = await image.read()
-
-
-            if not image_bytes:
-
-                return {
-                    "success": False,
-                    "error":
-                        "Uploaded image is empty"
-                }
-
 
             print()
             print("========================================")
             print("IMAGE RECEIVED")
             print("========================================")
+            print("Filename:", image.filename)
 
-            print(
-                "Filename:",
-                image.filename
-            )
-
-            print(
-                "Size:",
-                len(image_bytes),
-                "bytes"
-            )
-
-
-            # ------------------------------------------------
-            # TEMP FILE FOR AI
-            # ------------------------------------------------
-
-            temp_file = tempfile.NamedTemporaryFile(
-                delete=False,
-                suffix=extension
-            )
-
-            temp_image_path = Path(
-                temp_file.name
-            )
-
-            temp_file.write(
-                image_bytes
-            )
-
-            temp_file.close()
-
-
-            # ------------------------------------------------
-            # AI ANALYSIS
-            # ------------------------------------------------
+            temp_image_path = prepare_image_for_civiclens(image)
 
             print()
             print("========================================")
             print("RUNNING CIVICLENS AI")
             print("========================================")
 
-
-            ai_result = analyze_image(
-                str(temp_image_path),
-                AI_MODEL
-            )
-
+            ai_result = analyze_image(str(temp_image_path), AI_MODEL)
 
             print()
             print("AI RESULT:")
-
-            print(
-                ai_result
-            )
-
-
-            # ------------------------------------------------
-            # SUPABASE STORAGE UPLOAD
-            # ------------------------------------------------
+            print(ai_result)
 
             print()
             print("========================================")
             print("UPLOADING IMAGE TO SUPABASE STORAGE")
             print("========================================")
 
+            with open(temp_image_path, "rb") as optimized_file:
+                optimized_image_bytes = optimized_file.read()
 
-            storage_result = (
-                upload_to_supabase_storage(
-                    image_bytes,
-                    image.filename,
-                    image.content_type
-                )
+            storage_result = upload_to_supabase_storage(
+                optimized_image_bytes,
+                "civiclens_report.jpg",
+                "image/jpeg"
             )
 
+            image_storage_path = storage_result["object_path"]
+            image_url = storage_result["public_url"]
 
-            image_storage_path = (
-                storage_result["object_path"]
-            )
+            print("Storage path:", image_storage_path)
+            print("Public image URL:", image_url)
 
-
-            image_url = (
-                storage_result["public_url"]
-            )
-
-
-            print(
-                "Storage path:",
-                image_storage_path
-            )
-
-            print(
-                "Public image URL:",
-                image_url
-            )
-
+            del optimized_image_bytes
+            gc.collect()
 
         else:
 
-            # ------------------------------------------------
-            # NO IMAGE
-            # ------------------------------------------------
-
             ai_result = {
-
                 "success": True,
-
                 "damage_detected": False,
-
                 "damage_count": 0,
-
                 "damage_types": [],
-
                 "highest_confidence": 0,
-
                 "detections": [],
-
-                "ai_status":
-                    "No image provided"
+                "ai_status": "No image provided"
             }
 
 
-        # ----------------------------------------------------
         # GPS ROAD MATCHING
         # ----------------------------------------------------
 
@@ -1270,6 +1231,8 @@ async def report_issue(
                     "Temporary image cleanup error:",
                     cleanup_error
                 )
+
+        gc.collect()
 
 
 # ============================================================
