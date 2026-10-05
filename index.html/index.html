@@ -1277,11 +1277,17 @@
 
 
         /* =====================================================
-           GPS - HIGH ACCURACY LOCATION
+           GPS - MULTI-READ HIGH ACCURACY LOCATION
         ===================================================== */
 
-        const GPS_MAX_ACCURACY_METERS = 50;
-        const GPS_TIMEOUT_MS = 20000;
+        const GPS_MAX_ACCURACY_METERS = 100;
+        const GPS_SESSION_TIMEOUT_MS = 25000;
+        const GPS_MIN_VALID_ACCURACY_METERS = 5000;
+
+        let gpsWatchId = null;
+        let gpsTimeoutId = null;
+        let bestGPSReading = null;
+        let gpsReadingCount = 0;
 
         function setGPSButton(text, disabled = false) {
             gpsButton.textContent = text;
@@ -1293,131 +1299,181 @@
             document.getElementById("longitude").value = "";
         }
 
-        gpsButton.addEventListener(
-            "click",
-            function () {
+        function stopGPSWatch() {
+            if (gpsWatchId !== null) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+            }
 
-                if (!navigator.geolocation) {
-                    showMessage(
-                        "GPS is not supported by this browser.",
-                        "error"
-                    );
-                    return;
-                }
+            if (gpsTimeoutId !== null) {
+                clearTimeout(gpsTimeoutId);
+                gpsTimeoutId = null;
+            }
+        }
 
+        function isValidGPSReading(position) {
+            if (!position || !position.coords) return false;
+
+            const { latitude, longitude, accuracy } = position.coords;
+
+            return (
+                Number.isFinite(latitude) &&
+                Number.isFinite(longitude) &&
+                Number.isFinite(accuracy) &&
+                latitude >= -90 &&
+                latitude <= 90 &&
+                longitude >= -180 &&
+                longitude <= 180 &&
+                accuracy > 0 &&
+                accuracy <= GPS_MIN_VALID_ACCURACY_METERS
+            );
+        }
+
+        function finishGPSCapture() {
+            stopGPSWatch();
+
+            if (!bestGPSReading) {
+                clearGPSFields();
+                setGPSButton("📍 Retry GPS Location", false);
+                showMessage(
+                    "No usable GPS location was received. Turn on device location, enable precise location for your browser, and try again.",
+                    "error"
+                );
+                return;
+            }
+
+            const { latitude, longitude, accuracy } = bestGPSReading.coords;
+
+            console.log("CivicLens best GPS reading:", {
+                latitude,
+                longitude,
+                accuracy,
+                readings: gpsReadingCount
+            });
+
+            document.getElementById("latitude").value = latitude.toFixed(7);
+            document.getElementById("longitude").value = longitude.toFixed(7);
+
+            if (accuracy <= GPS_MAX_ACCURACY_METERS) {
                 setGPSButton(
-                    "📍 Getting accurate location...",
-                    true
+                    `✅ GPS Captured (${Math.round(accuracy)} m accuracy)`,
+                    false
                 );
 
                 showMessage(
-                    "Requesting high-accuracy GPS. Please stay still and keep location services enabled.",
+                    `Location captured successfully from ${gpsReadingCount} GPS reading(s). Best accuracy: approximately ${Math.round(accuracy)} metres.`,
                     "success"
                 );
+            } else {
+                setGPSButton(
+                    `⚠️ GPS Captured (${Math.round(accuracy)} m)`,
+                    false
+                );
 
-                navigator.geolocation.getCurrentPosition(
-
-                    function (position) {
-
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        const accuracy = position.coords.accuracy;
-
-                        console.log("CivicLens GPS:", {
-                            latitude,
-                            longitude,
-                            accuracy
-                        });
-
-                        if (
-                            !Number.isFinite(latitude) ||
-                            !Number.isFinite(longitude) ||
-                            latitude < -90 ||
-                            latitude > 90 ||
-                            longitude < -180 ||
-                            longitude > 180
-                        ) {
-                            clearGPSFields();
-                            setGPSButton(
-                                "📍 Use My Current Location",
-                                false
-                            );
-                            showMessage(
-                                "Invalid GPS coordinates were returned. Please try again.",
-                                "error"
-                            );
-                            return;
-                        }
-
-                        if (
-                            !Number.isFinite(accuracy) ||
-                            accuracy > GPS_MAX_ACCURACY_METERS
-                        ) {
-                            clearGPSFields();
-                            setGPSButton(
-                                "📍 Retry GPS Location",
-                                false
-                            );
-                            showMessage(
-                                `GPS accuracy is too low (${Math.round(accuracy || 0)} m). Please enable precise location, move outdoors or near a window, and try again. CivicLens requires accuracy of ${GPS_MAX_ACCURACY_METERS} m or better.`,
-                                "error"
-                            );
-                            return;
-                        }
-
-                        document.getElementById(
-                            "latitude"
-                        ).value = latitude.toFixed(7);
-
-                        document.getElementById(
-                            "longitude"
-                        ).value = longitude.toFixed(7);
-
-                        setGPSButton(
-                            `✅ GPS Captured (${Math.round(accuracy)} m accuracy)`,
-                            false
-                        );
-
-                        showMessage(
-                            `Location captured successfully. GPS accuracy: approximately ${Math.round(accuracy)} metres.`,
-                            "success"
-                        );
-                    },
-
-                    function (error) {
-
-                        console.error("CivicLens GPS error:", error);
-
-                        setGPSButton(
-                            "📍 Retry GPS Location",
-                            false
-                        );
-
-                        let message = "Unable to get GPS location.";
-
-                        if (error.code === 1) {
-                            message =
-                                "Location permission was denied. Allow location access for CivicLens and try again.";
-                        } else if (error.code === 2) {
-                            message =
-                                "Your device could not determine its location. Turn on GPS/location services and try again.";
-                        } else if (error.code === 3) {
-                            message =
-                                "GPS took too long to respond. Move outdoors or near a window and try again.";
-                        }
-
-                        showMessage(message, "error");
-                    },
-
-                    {
-                        enableHighAccuracy: true,
-                        timeout: GPS_TIMEOUT_MS,
-                        maximumAge: 0
-                    }
-
+                showMessage(
+                    `Best GPS accuracy after ${gpsReadingCount} reading(s) was ${Math.round(accuracy)} m. For better road matching, enable precise location and try again outdoors or near a window.`,
+                    "error"
                 );
             }
-        );
+        }
+
+        gpsButton.addEventListener("click", function () {
+            if (!navigator.geolocation) {
+                showMessage(
+                    "GPS is not supported by this browser.",
+                    "error"
+                );
+                return;
+            }
+
+            stopGPSWatch();
+            bestGPSReading = null;
+            gpsReadingCount = 0;
+
+            clearGPSFields();
+            setGPSButton("📍 Finding your best GPS location...", true);
+
+            showMessage(
+                "Finding your best GPS location. Keep the phone still and keep location services enabled. CivicLens will collect multiple readings.",
+                "success"
+            );
+
+            gpsWatchId = navigator.geolocation.watchPosition(
+                function (position) {
+                    if (!isValidGPSReading(position)) {
+                        console.warn(
+                            "Ignoring invalid/coarse GPS reading:",
+                            position && position.coords
+                        );
+                        return;
+                    }
+
+                    gpsReadingCount++;
+
+                    const accuracy = position.coords.accuracy;
+
+                    console.log("CivicLens GPS reading #" + gpsReadingCount, {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy
+                    });
+
+                    if (
+                        !bestGPSReading ||
+                        accuracy < bestGPSReading.coords.accuracy
+                    ) {
+                        bestGPSReading = position;
+                    }
+
+                    setGPSButton(
+                        `📍 GPS reading ${gpsReadingCount} (${Math.round(accuracy)} m)...`,
+                        true
+                    );
+
+                    if (accuracy <= GPS_MAX_ACCURACY_METERS) {
+                        finishGPSCapture();
+                    }
+                },
+
+                function (error) {
+                    console.error("CivicLens GPS error:", error);
+
+                    stopGPSWatch();
+
+                    if (bestGPSReading) {
+                        finishGPSCapture();
+                        return;
+                    }
+
+                    setGPSButton("📍 Retry GPS Location", false);
+
+                    let message = "Unable to get GPS location.";
+
+                    if (error.code === 1) {
+                        message =
+                            "Location permission was denied. Allow precise location access for CivicLens and try again.";
+                    } else if (error.code === 2) {
+                        message =
+                            "Your device could not determine its location. Turn on GPS/location services and try again.";
+                    } else if (error.code === 3) {
+                        message =
+                            "GPS took too long to respond. Move outdoors or near a window and try again.";
+                    }
+
+                    showMessage(message, "error");
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+
+            gpsTimeoutId = setTimeout(function () {
+                finishGPSCapture();
+            }, GPS_SESSION_TIMEOUT_MS);
+        });
 
 
         /* =====================================================
