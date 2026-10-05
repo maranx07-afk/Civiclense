@@ -624,140 +624,6 @@
             font-size: 13px;
         }
 
-
-        /* =========================
-           INTERACTIVE MAP
-        ========================= */
-
-        .map-card {
-            overflow: hidden;
-        }
-
-        .map-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 14px;
-            flex-wrap: wrap;
-        }
-
-        .map-legend {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            color: #475569;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .legend-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            border: 2px solid white;
-            box-shadow: 0 0 0 1px #cbd5e1;
-        }
-
-        .legend-dot.ai {
-            background: #dc2626;
-        }
-
-        .legend-dot.reported {
-            background: #2563eb;
-        }
-
-        .map-button {
-            border: none;
-            border-radius: 9px;
-            padding: 9px 12px;
-            background: #e0f2fe;
-            color: #0369a1;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .map-button:hover {
-            background: #bae6fd;
-        }
-
-        #issueMap {
-            width: 100%;
-            height: 430px;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            z-index: 1;
-        }
-
-        .map-popup {
-            min-width: 220px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .map-popup h4 {
-            margin: 0 0 7px;
-            font-size: 16px;
-            color: #0f172a;
-        }
-
-        .map-popup p {
-            margin: 4px 0;
-            color: #475569;
-            font-size: 12px;
-        }
-
-        .map-popup .verified {
-            display: inline-block;
-            margin-top: 7px;
-            padding: 4px 7px;
-            border-radius: 7px;
-            background: #dcfce7;
-            color: #166534;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .map-popup .unverified {
-            display: inline-block;
-            margin-top: 7px;
-            padding: 4px 7px;
-            border-radius: 7px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .map-popup .popup-button {
-            width: 100%;
-            margin-top: 9px;
-            border: none;
-            border-radius: 8px;
-            padding: 8px;
-            background: #0f172a;
-            color: white;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .map-popup .popup-button:hover {
-            background: #1e293b;
-        }
-
-        .map-summary {
-            margin-top: 10px;
-            color: #64748b;
-            font-size: 12px;
-        }
-
         /* =========================
            DESKTOP
         ========================= */
@@ -797,11 +663,6 @@
         ========================= */
 
         @media (max-width: 600px) {
-
-
-            #issueMap {
-                height: 360px;
-            }
 
             .container {
                 padding: 12px;
@@ -855,158 +716,7 @@
 
         }
 
-    
-/* ===== Accountability Dashboard ===== */
-.accountability-section {
-    padding: 28px 0 10px;
-}
-.accountability-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-    margin: 18px 0 22px;
-}
-.accountability-card {
-    background: var(--card-bg, #fff);
-    border: 1px solid rgba(0,0,0,.08);
-    border-radius: 16px;
-    padding: 18px;
-    box-shadow: 0 6px 20px rgba(0,0,0,.06);
-}
-.accountability-card .label {
-    font-size: .82rem;
-    opacity: .72;
-    margin-bottom: 7px;
-}
-.accountability-card .value {
-    font-size: 1.55rem;
-    font-weight: 800;
-}
-.accountability-table-wrap {
-    overflow-x: auto;
-    border-radius: 16px;
-    border: 1px solid rgba(0,0,0,.08);
-    background: var(--card-bg, #fff);
-}
-.accountability-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 820px;
-}
-.accountability-table th,
-.accountability-table td {
-    padding: 13px 14px;
-    text-align: left;
-    border-bottom: 1px solid rgba(0,0,0,.07);
-    vertical-align: top;
-}
-.accountability-table th {
-    font-size: .82rem;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    opacity: .72;
-}
-.accountability-table tr:last-child td {
-    border-bottom: 0;
-}
-.accountability-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 9px;
-    border-radius: 999px;
-    font-size: .75rem;
-    font-weight: 700;
-}
-.accountability-badge.ai {
-    background: rgba(220, 38, 38, .10);
-    color: #b91c1c;
-}
-.accountability-badge.reported {
-    background: rgba(37, 99, 235, .10);
-    color: #1d4ed8;
-}
-.accountability-muted {
-    opacity: .65;
-}
-.accountability-empty {
-    padding: 28px;
-    text-align: center;
-    opacity: .7;
-}
-.accountability-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 14px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-.accountability-refresh {
-    border: 0;
-    border-radius: 10px;
-    padding: 9px 13px;
-    cursor: pointer;
-    font-weight: 700;
-}
-.authority-card {
-    background: var(--card-bg, #fff);
-    border: 1px solid rgba(0,0,0,.08);
-    border-radius: 16px;
-    padding: 18px;
-}
-.authority-card h4 {
-    margin: 0 0 5px;
-}
-.authority-meta {
-    font-size: .84rem;
-    opacity: .72;
-    margin-bottom: 14px;
-}
-.authority-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 9px;
-}
-.authority-stat {
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(0,0,0,.035);
-}
-.authority-stat strong {
-    display: block;
-    font-size: 1.15rem;
-}
-.authority-stat span {
-    display: block;
-    font-size: .72rem;
-    opacity: .7;
-}
-.authority-cards {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-    margin-top: 16px;
-}
-@media (max-width: 900px) {
-    .accountability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .authority-cards { grid-template-columns: 1fr; }
-}
-@media (max-width: 560px) {
-    .accountability-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .accountability-card { padding: 14px; }
-    .accountability-card .value { font-size: 1.25rem; }
-    .authority-stats { grid-template-columns: 1fr 1fr 1fr; }
-}
-
-</style>
-
-    <!-- CivicLens Interactive Map -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        crossorigin=""
-    >
-
+    </style>
 </head>
 
 <body>
@@ -1386,98 +1096,6 @@
         </section>
 
 
-
-        <!-- =========================
-             INTERACTIVE ISSUE MAP
-        ========================= -->
-
-        
-<!-- ===== Accountability Dashboard ===== -->
-<section class="accountability-section" id="accountabilityDashboard">
-    <div class="accountability-header">
-        <div>
-            <h2>🏛️ Government Accountability Dashboard</h2>
-            <p>Road-wise issues, AI verification, responsible authorities and project information.</p>
-        </div>
-        <button class="accountability-refresh" type="button" onclick="loadAccountabilityDashboard()">
-            🔄 Refresh dashboard
-        </button>
-    </div>
-
-    <div class="accountability-grid" id="accountabilityStats">
-        <div class="accountability-card">
-            <div class="label">Total reports</div>
-            <div class="value" id="dashTotalReports">—</div>
-        </div>
-        <div class="accountability-card">
-            <div class="label">AI verified</div>
-            <div class="value" id="dashAIReports">—</div>
-        </div>
-        <div class="accountability-card">
-            <div class="label">Roads affected</div>
-            <div class="value" id="dashRoads">—</div>
-        </div>
-        <div class="accountability-card">
-            <div class="label">Authorities involved</div>
-            <div class="value" id="dashAuthorities">—</div>
-        </div>
-    </div>
-
-    <div class="authority-cards" id="authorityCards">
-        <div class="accountability-empty">Loading authority accountability data…</div>
-    </div>
-
-    <div style="margin-top:22px;">
-        <h3>📋 Road & Project Accountability</h3>
-        <div class="accountability-table-wrap" id="accountabilityTableWrap">
-            <div class="accountability-empty">Loading road accountability data…</div>
-        </div>
-    </div>
-</section>
-
-<section class="card map-card">
-
-            <div class="card-title">
-                🗺️ Live Infrastructure Issue Map
-            </div>
-
-            <div class="card-subtitle">
-                Explore reported infrastructure problems by location.
-                AI-verified damage is highlighted on the map.
-            </div>
-
-            <div class="map-toolbar">
-                <div class="map-legend">
-                    <span class="legend-item">
-                        <span class="legend-dot ai"></span>
-                        AI verified
-                    </span>
-                    <span class="legend-item">
-                        <span class="legend-dot reported"></span>
-                        Reported
-                    </span>
-                </div>
-
-                <button
-                    type="button"
-                    class="map-button"
-                    id="mapLocateButton"
-                >
-                    📍 Center on my location
-                </button>
-            </div>
-
-            <div id="issueMap"></div>
-
-            <div
-                id="mapSummary"
-                class="map-summary"
-            >
-                Loading issue locations...
-            </div>
-
-        </section>
-
         <!-- =========================
              TRANSPARENCY
         ========================= -->
@@ -1553,12 +1171,6 @@
     </footer>
 
 
-
-    <script
-        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        crossorigin=""
-    ></script>
-
     <script>
 
         /* =====================================================
@@ -1610,15 +1222,6 @@
 
         const reportsList =
             document.getElementById("reportsList");
-
-        const mapSummary =
-            document.getElementById("mapSummary");
-
-        const mapLocateButton =
-            document.getElementById("mapLocateButton");
-
-        let issueMap = null;
-        let issueMarkers = [];
 
 
         /* =====================================================
@@ -1674,78 +1277,145 @@
 
 
         /* =====================================================
-           GPS
+           GPS - HIGH ACCURACY LOCATION
         ===================================================== */
+
+        const GPS_MAX_ACCURACY_METERS = 50;
+        const GPS_TIMEOUT_MS = 20000;
+
+        function setGPSButton(text, disabled = false) {
+            gpsButton.textContent = text;
+            gpsButton.disabled = disabled;
+        }
+
+        function clearGPSFields() {
+            document.getElementById("latitude").value = "";
+            document.getElementById("longitude").value = "";
+        }
 
         gpsButton.addEventListener(
             "click",
             function () {
 
                 if (!navigator.geolocation) {
-
                     showMessage(
                         "GPS is not supported by this browser.",
                         "error"
                     );
-
                     return;
                 }
 
-                gpsButton.disabled =
-                    true;
+                setGPSButton(
+                    "📍 Getting accurate location...",
+                    true
+                );
 
-                gpsButton.textContent =
-                    "📍 Getting location...";
-
+                showMessage(
+                    "Requesting high-accuracy GPS. Please stay still and keep location services enabled.",
+                    "success"
+                );
 
                 navigator.geolocation.getCurrentPosition(
 
                     function (position) {
 
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+
+                        console.log("CivicLens GPS:", {
+                            latitude,
+                            longitude,
+                            accuracy
+                        });
+
+                        if (
+                            !Number.isFinite(latitude) ||
+                            !Number.isFinite(longitude) ||
+                            latitude < -90 ||
+                            latitude > 90 ||
+                            longitude < -180 ||
+                            longitude > 180
+                        ) {
+                            clearGPSFields();
+                            setGPSButton(
+                                "📍 Use My Current Location",
+                                false
+                            );
+                            showMessage(
+                                "Invalid GPS coordinates were returned. Please try again.",
+                                "error"
+                            );
+                            return;
+                        }
+
+                        if (
+                            !Number.isFinite(accuracy) ||
+                            accuracy > GPS_MAX_ACCURACY_METERS
+                        ) {
+                            clearGPSFields();
+                            setGPSButton(
+                                "📍 Retry GPS Location",
+                                false
+                            );
+                            showMessage(
+                                `GPS accuracy is too low (${Math.round(accuracy || 0)} m). Please enable precise location, move outdoors or near a window, and try again. CivicLens requires accuracy of ${GPS_MAX_ACCURACY_METERS} m or better.`,
+                                "error"
+                            );
+                            return;
+                        }
+
                         document.getElementById(
                             "latitude"
-                        ).value =
-                            position.coords.latitude;
-
+                        ).value = latitude.toFixed(7);
 
                         document.getElementById(
                             "longitude"
-                        ).value =
-                            position.coords.longitude;
+                        ).value = longitude.toFixed(7);
 
+                        setGPSButton(
+                            `✅ GPS Captured (${Math.round(accuracy)} m accuracy)`,
+                            false
+                        );
 
-                        gpsButton.disabled =
-                            false;
-
-                        gpsButton.textContent =
-                            "✅ Location Captured";
-
+                        showMessage(
+                            `Location captured successfully. GPS accuracy: approximately ${Math.round(accuracy)} metres.`,
+                            "success"
+                        );
                     },
 
                     function (error) {
 
-                        gpsButton.disabled =
-                            false;
+                        console.error("CivicLens GPS error:", error);
 
-                        gpsButton.textContent =
-                            "📍 Use My Current Location";
-
-                        showMessage(
-                            "Unable to get GPS location: " +
-                            error.message,
-                            "error"
+                        setGPSButton(
+                            "📍 Retry GPS Location",
+                            false
                         );
 
+                        let message = "Unable to get GPS location.";
+
+                        if (error.code === 1) {
+                            message =
+                                "Location permission was denied. Allow location access for CivicLens and try again.";
+                        } else if (error.code === 2) {
+                            message =
+                                "Your device could not determine its location. Turn on GPS/location services and try again.";
+                        } else if (error.code === 3) {
+                            message =
+                                "GPS took too long to respond. Move outdoors or near a window and try again.";
+                        }
+
+                        showMessage(message, "error");
                     },
 
                     {
                         enableHighAccuracy: true,
-                        timeout: 10000,
+                        timeout: GPS_TIMEOUT_MS,
                         maximumAge: 0
                     }
 
                 );
-
             }
         );
 
@@ -1936,6 +1606,44 @@
                 );
 
 
+                const latitudeValue =
+                    document.getElementById("latitude").value.trim();
+
+                const longitudeValue =
+                    document.getElementById("longitude").value.trim();
+
+                if (!latitudeValue || !longitudeValue) {
+                    showMessage(
+                        "Please capture your current GPS location before submitting the report.",
+                        "error"
+                    );
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "🚀 Submit Report";
+                    return;
+                }
+
+                const latitudeNumber = Number(latitudeValue);
+                const longitudeNumber = Number(longitudeValue);
+
+                if (
+                    !Number.isFinite(latitudeNumber) ||
+                    !Number.isFinite(longitudeNumber) ||
+                    latitudeNumber < -90 ||
+                    latitudeNumber > 90 ||
+                    longitudeNumber < -180 ||
+                    longitudeNumber > 180
+                ) {
+                    showMessage(
+                        "The GPS coordinates are invalid. Please capture your current location again.",
+                        "error"
+                    );
+
+                    submitButton.disabled = false;
+                    submitButton.textContent = "🚀 Submit Report";
+                    return;
+                }
+
                 const imageFile =
                     imageInput.files[0];
 
@@ -2027,6 +1735,7 @@
 
                     gpsButton.textContent =
                         "📍 Use My Current Location";
+                    clearGPSFields();
 
 
                     /* =============================
@@ -2069,318 +1778,6 @@
             }
         );
 
-
-
-        /* =====================================================
-           INTERACTIVE ISSUE MAP
-        ===================================================== */
-
-        function createMap() {
-            if (typeof L === "undefined") {
-                mapSummary.textContent =
-                    "Map library could not be loaded.";
-                return;
-            }
-
-            issueMap = L.map("issueMap");
-
-            L.tileLayer(
-                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {
-                    maxZoom: 19,
-                    attribution:
-                        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
-                }
-            ).addTo(issueMap);
-
-            // Initial view: Salem, Tamil Nadu, matching the current demo data.
-            issueMap.setView(
-                [11.6643, 78.1460],
-                13
-            );
-        }
-
-
-        function clearIssueMarkers() {
-            issueMarkers.forEach(function (marker) {
-                issueMap.removeLayer(marker);
-            });
-
-            issueMarkers = [];
-        }
-
-
-        function getMarkerColor(issue) {
-            const aiVerified =
-                Number(issue.ai_damage_detected) === 1 ||
-                issue.ai_status === "Damage detected";
-
-            return aiVerified ? "#dc2626" : "#2563eb";
-        }
-
-
-        function escapePopup(value) {
-            const text =
-                value === null ||
-                value === undefined
-                    ? "Not available"
-                    : String(value);
-
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-
-        function buildPopup(issue) {
-            const aiVerified =
-                Number(issue.ai_damage_detected) === 1 ||
-                issue.ai_status === "Damage detected";
-
-            const types =
-                Array.isArray(issue.ai_damage_types)
-                    ? issue.ai_damage_types.join(", ")
-                    : "Road damage";
-
-            const confidence =
-                issue.ai_highest_confidence != null &&
-                Number(issue.ai_highest_confidence) > 0
-                    ? Number(issue.ai_highest_confidence) + "%"
-                    : "N/A";
-
-            const road =
-                issue.road_name ||
-                "Road not matched";
-
-            const authority =
-                issue.authority_name ||
-                "Authority not available";
-
-            const badge = aiVerified
-                ? `<span class="verified">🤖 AI verified • ${escapePopup(types)} • ${escapePopup(confidence)}</span>`
-                : `<span class="unverified">📋 Reported issue</span>`;
-
-            return `
-                <div class="map-popup">
-                    <h4>
-                        ${escapePopup(
-                            issue.issue_type ||
-                            "Infrastructure issue"
-                        )}
-                    </h4>
-
-                    <p>
-                        <strong>Issue #${escapePopup(issue.id)}</strong>
-                    </p>
-
-                    <p>
-                        📍 ${escapePopup(issue.latitude)},
-                        ${escapePopup(issue.longitude)}
-                    </p>
-
-                    <p>
-                        🛣️ ${escapePopup(road)}
-                    </p>
-
-                    <p>
-                        🏛️ ${escapePopup(authority)}
-                    </p>
-
-                    ${badge}
-
-                    <button
-                        class="popup-button"
-                        type="button"
-                        onclick="focusReport(${Number(issue.id)})"
-                    >
-                        View transparency report
-                    </button>
-                </div>
-            `;
-        }
-
-
-        function updateIssueMap(issues) {
-            if (!issueMap) {
-                return;
-            }
-
-            clearIssueMarkers();
-
-            const validIssues =
-                issues.filter(function (issue) {
-                    const lat = Number(issue.latitude);
-                    const lon = Number(issue.longitude);
-
-                    return (
-                        Number.isFinite(lat) &&
-                        Number.isFinite(lon) &&
-                        lat >= -90 &&
-                        lat <= 90 &&
-                        lon >= -180 &&
-                        lon <= 180
-                    );
-                });
-
-            if (validIssues.length === 0) {
-                mapSummary.textContent =
-                    "No reports with valid GPS coordinates.";
-                return;
-            }
-
-            const bounds = [];
-
-            validIssues.forEach(function (issue) {
-                const lat = Number(issue.latitude);
-                const lon = Number(issue.longitude);
-
-                const marker = L.circleMarker(
-                    [lat, lon],
-                    {
-                        radius: 9,
-                        color: "#ffffff",
-                        weight: 2,
-                        fillColor: getMarkerColor(issue),
-                        fillOpacity: 0.9
-                    }
-                );
-
-                marker.bindPopup(
-                    buildPopup(issue)
-                );
-
-                marker.addTo(issueMap);
-                issueMarkers.push(marker);
-                bounds.push([lat, lon]);
-            });
-
-            if (bounds.length === 1) {
-                issueMap.setView(
-                    bounds[0],
-                    15
-                );
-            } else {
-                issueMap.fitBounds(
-                    bounds,
-                    {
-                        padding: [25, 25],
-                        maxZoom: 15
-                    }
-                );
-            }
-
-            const aiCount =
-                validIssues.filter(
-                    function (issue) {
-                        return (
-                            Number(
-                                issue.ai_damage_detected
-                            ) === 1 ||
-                            issue.ai_status ===
-                                "Damage detected"
-                        );
-                    }
-                ).length;
-
-            mapSummary.textContent =
-                `${validIssues.length} issue location(s) shown • ${aiCount} AI verified`;
-        }
-
-
-        function focusReport(issueId) {
-            const input =
-                document.getElementById(
-                    "transparencyId"
-                );
-
-            input.value = issueId;
-
-            loadTransparency();
-
-            document.getElementById(
-                "transparencyResult"
-            ).scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }
-
-
-        mapLocateButton.addEventListener(
-            "click",
-            function () {
-                if (!navigator.geolocation) {
-                    mapSummary.textContent =
-                        "GPS is not supported by this browser.";
-                    return;
-                }
-
-                mapLocateButton.disabled = true;
-                mapLocateButton.textContent =
-                    "📍 Locating...";
-
-                navigator.geolocation.getCurrentPosition(
-                    function (position) {
-                        const lat =
-                            position.coords.latitude;
-
-                        const lon =
-                            position.coords.longitude;
-
-                        if (issueMap) {
-                            issueMap.setView(
-                                [lat, lon],
-                                16
-                            );
-
-                            L.circleMarker(
-                                [lat, lon],
-                                {
-                                    radius: 8,
-                                    color: "#ffffff",
-                                    weight: 2,
-                                    fillColor: "#16a34a",
-                                    fillOpacity: 0.95
-                                }
-                            )
-                                .addTo(issueMap)
-                                .bindPopup(
-                                    "📍 Your current location"
-                                )
-                                .openPopup();
-                        }
-
-                        mapLocateButton.disabled =
-                            false;
-
-                        mapLocateButton.textContent =
-                            "📍 Center on my location";
-                    },
-                    function (error) {
-                        mapLocateButton.disabled =
-                            false;
-
-                        mapLocateButton.textContent =
-                            "📍 Center on my location";
-
-                        mapSummary.textContent =
-                            "Unable to get your location: " +
-                            error.message;
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-                );
-            }
-        );
-
-
-        createMap();
 
         /* =====================================================
            LOAD REPORTS
@@ -2435,9 +1832,6 @@
                     )
                         ? data.issues
                         : [];
-
-
-                updateIssueMap(issues);
 
 
                 /* =============================
@@ -3166,209 +2560,7 @@
             30000
         );
 
-    
-/* ===== Accountability Dashboard ===== */
-function safeNumber(value) {
-    const n = Number(value);
-    return Number.isFinite(n) ? n : 0;
-}
-
-function dashboardText(value, fallback = "Not available") {
-    return value === null || value === undefined || value === "" ? fallback : String(value);
-}
-
-async function fetchTransparencyForIssue(issueId) {
-    try {
-        const response = await fetch(`${API_BASE}/issue-transparency/${encodeURIComponent(issueId)}?t=${Date.now()}`, {
-            cache: "no-store"
-        });
-        if (!response.ok) return null;
-        const data = await response.json();
-        return data && data.success !== false ? (data.report || data.data || data) : null;
-    } catch (error) {
-        console.warn("Transparency lookup failed for issue", issueId, error);
-        return null;
-    }
-}
-
-async function loadAccountabilityDashboard() {
-    const totalEl = document.getElementById("dashTotalReports");
-    const aiEl = document.getElementById("dashAIReports");
-    const roadsEl = document.getElementById("dashRoads");
-    const authoritiesEl = document.getElementById("dashAuthorities");
-    const authorityCards = document.getElementById("authorityCards");
-    const tableWrap = document.getElementById("accountabilityTableWrap");
-
-    if (!totalEl || !authorityCards || !tableWrap) return;
-
-    try {
-        totalEl.textContent = "…";
-        aiEl.textContent = "…";
-        roadsEl.textContent = "…";
-        authoritiesEl.textContent = "…";
-
-        const response = await fetch(`${API_BASE}/issues?t=${Date.now()}`, { cache: "no-store" });
-        if (!response.ok) throw new Error(`Issues API returned ${response.status}`);
-
-        const payload = await response.json();
-        const issues = Array.isArray(payload.issues) ? payload.issues : [];
-
-        const aiVerified = issues.filter(i => safeNumber(i.ai_damage_detected) === 1 || safeNumber(i.ai_damage_count) > 0);
-        const roads = new Map();
-        const authorities = new Map();
-
-        issues.forEach(issue => {
-            const roadId = issue.road_id ?? issue.road?.id ?? null;
-            const roadName = issue.road_name ?? issue.road?.road_name ?? null;
-            const authorityName = issue.authority_name ?? issue.authority?.name ?? null;
-
-            if (roadId || roadName) {
-                const key = String(roadId || roadName);
-                if (!roads.has(key)) {
-                    roads.set(key, {
-                        roadId,
-                        roadName: roadName || "Unnamed road",
-                        roadType: issue.road_type || issue.road?.road_type || "—",
-                        area: issue.area || issue.road_area || issue.road?.area || "—",
-                        authority: authorityName || "Not assigned",
-                        reports: 0,
-                        ai: 0,
-                        issueIds: []
-                    });
-                }
-                const r = roads.get(key);
-                r.reports++;
-                if (safeNumber(issue.ai_damage_detected) === 1 || safeNumber(issue.ai_damage_count) > 0) r.ai++;
-                r.issueIds.push(issue.id);
-            }
-
-            if (authorityName) {
-                const key = authorityName.trim();
-                if (!authorities.has(key)) {
-                    authorities.set(key, {
-                        name: key,
-                        reports: 0,
-                        ai: 0,
-                        roads: new Set(),
-                        departments: new Set()
-                    });
-                }
-                const a = authorities.get(key);
-                a.reports++;
-                if (safeNumber(issue.ai_damage_detected) === 1 || safeNumber(issue.ai_damage_count) > 0) a.ai++;
-                if (roadId || roadName) a.roads.add(String(roadId || roadName));
-                const dept = issue.authority_department ?? issue.authority?.department;
-                if (dept) a.departments.add(dept);
-            }
-        });
-
-        totalEl.textContent = issues.length;
-        aiEl.textContent = aiVerified.length;
-        roadsEl.textContent = roads.size;
-        authoritiesEl.textContent = authorities.size;
-
-        if (!authorities.size) {
-            authorityCards.innerHTML = `<div class="accountability-empty">No authority-linked reports yet.</div>`;
-        } else {
-            authorityCards.innerHTML = Array.from(authorities.values())
-                .sort((a, b) => b.reports - a.reports)
-                .map(a => `
-                    <div class="authority-card">
-                        <h4>${escapePopup(a.name)}</h4>
-                        <div class="authority-meta">
-                            ${a.departments.size ? escapePopup(Array.from(a.departments).join(" • ")) : "Department not available"}
-                        </div>
-                        <div class="authority-stats">
-                            <div class="authority-stat">
-                                <strong>${a.reports}</strong>
-                                <span>Reports</span>
-                            </div>
-                            <div class="authority-stat">
-                                <strong>${a.ai}</strong>
-                                <span>AI verified</span>
-                            </div>
-                            <div class="authority-stat">
-                                <strong>${a.roads.size}</strong>
-                                <span>Roads</span>
-                            </div>
-                        </div>
-                    </div>
-                `).join("");
-        }
-
-        if (!roads.size) {
-            tableWrap.innerHTML = `<div class="accountability-empty">No road-linked reports available yet.</div>`;
-            return;
-        }
-
-        // Fetch transparency/project details for one representative issue per road.
-        const roadRows = await Promise.all(Array.from(roads.values()).map(async r => {
-            const transparency = r.issueIds.length ? await fetchTransparencyForIssue(r.issueIds[0]) : null;
-            r.transparency = transparency || {};
-            return r;
-        }));
-
-        tableWrap.innerHTML = `
-            <table class="accountability-table">
-                <thead>
-                    <tr>
-                        <th>Road</th>
-                        <th>Authority</th>
-                        <th>Issues</th>
-                        <th>AI verified</th>
-                        <th>Tender</th>
-                        <th>Project cost</th>
-                        <th>Contractor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${roadRows.map(r => {
-                        const t = r.transparency || {};
-                        const tender = t.tender_number ?? t.tender?.tender_number ?? null;
-                        const cost = t.project_cost ?? t.project?.project_cost ?? null;
-                        const contractor = t.contractor_name ?? t.contractor?.name ?? null;
-                        const authority = t.authority_name ?? t.authority?.name ?? r.authority;
-                        return `
-                            <tr>
-                                <td>
-                                    <strong>${escapePopup(r.roadName)}</strong><br>
-                                    <span class="accountability-muted">${escapePopup(r.roadType)} • ${escapePopup(r.area)}</span>
-                                </td>
-                                <td>${escapePopup(dashboardText(authority))}</td>
-                                <td>${r.reports}</td>
-                                <td>
-                                    <span class="accountability-badge ${r.ai > 0 ? "ai" : "reported"}">
-                                        ${r.ai > 0 ? "🤖 " + r.ai : "📌 0"}
-                                    </span>
-                                </td>
-                                <td>${escapePopup(dashboardText(tender))}</td>
-                                <td>${cost !== null && cost !== undefined && cost !== "" ? "₹" + safeNumber(cost).toLocaleString("en-IN") : "Not available"}</td>
-                                <td>${escapePopup(dashboardText(contractor))}</td>
-                            </tr>
-                        `;
-                    }).join("")}
-                </tbody>
-            </table>
-        `;
-    } catch (error) {
-        console.error("Accountability dashboard error:", error);
-        totalEl.textContent = "—";
-        aiEl.textContent = "—";
-        roadsEl.textContent = "—";
-        authoritiesEl.textContent = "—";
-        authorityCards.innerHTML = `<div class="accountability-empty">Unable to load accountability data. Check that the CivicLens backend is running.</div>`;
-        tableWrap.innerHTML = `<div class="accountability-empty">Unable to load road/project data.</div>`;
-    }
-}
-
-</script>
-
-
-setTimeout(() => {
-    if (typeof loadAccountabilityDashboard === "function") {
-        loadAccountabilityDashboard();
-    }
-}, 500);
+    </script>
 
 </body>
 </html>
